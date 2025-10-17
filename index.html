@@ -95,7 +95,7 @@
         <blockquote>
           {{ displayedProblem }}/<span class="hidden">{{ pendingProblem }}</span>
         </blockquote>
-        <p>シンキングタイム: {{ inputTimer }}</p>
+        <p>シンキングタイム: {{ Math.ceil(inputTimer / 1000) }}</p>
         <p :class="{ diminished: alphaError }">
           英数: {{ alphaInput }}|
         </p>
@@ -110,7 +110,7 @@
         <h2>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h2>
         <p>現在スコア {{ score }} <span v-if="scoreDiff" class="correct">(+{{ scoreDiff }})</span></p>
         <blockquote>{{ displayedProblem }}/{{ pendingProblem }}</blockquote>
-        <p class="diminished">シンキングタイム: {{ inputTimer }}</p>
+        <p class="diminished">シンキングタイム: {{ Math.ceil(inputTimer / 1000) }}</p>
         <p :class="{ diminished: !alphaCorrect, correct: alphaCorrect }">
           アルファベット: {{ alphaInput }}
           {{ alphaCorrect ? "⭕" : "" }}
