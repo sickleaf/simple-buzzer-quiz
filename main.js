@@ -1,5 +1,5 @@
 var TICK_INTERVAL = 100; /* msec */
-var INPUT_TIMER   = 50; /* ticks */
+var INPUT_TIMER   = 5000; /* msec */
 
 var STATES = {
     INTRO: 0,
@@ -159,8 +159,9 @@ var vm = new Vue({
                 return;
             }
             if (this.state === STATES.INPUT) {
-                this.inputTimer -= 1;
-                if (!this.inputTimer) {
+                this.inputTimer -= TICK_INTERVAL;
+                if (this.inputTimer <= 0) {
+                    this.inputTimer = 0;
                     this.inputError();
                 }
                 return;
