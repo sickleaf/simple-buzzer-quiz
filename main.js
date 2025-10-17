@@ -1,4 +1,4 @@
-var TICK_INTERVAL = 150;  /* msec */
+var TICK_INTERVAL = 120;  /* msec */
 var INPUT_TIMER   = 5000; /* msec */
 
 function shuffleArray (array) {
