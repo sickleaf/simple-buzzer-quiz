@@ -73,7 +73,7 @@ var vm = new Vue({
             this.problemId = problemId;
             this.scoreDiff = 200;
             this.displayedProblem = "";
-            this.pendingProblem = "問題: " + this.problems.problems[problemId].body.normalize();
+            this.pendingProblem = "問題:  " + this.problems.problems[problemId].body.normalize();
             this.kanaInput = this.alphaInput = this.pendingInput = "";
             this.alphaError = this.kanaError = this.alphaCorrect = this.kanaCorrect = false;
             this.inputTimer = INPUT_TIMER;
