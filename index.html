@@ -112,7 +112,7 @@
         <blockquote>{{ displayedProblem }}/{{ pendingProblem }}</blockquote>
         <p class="diminished">シンキングタイム: {{ Math.ceil(inputTimer / 1000) }}</p>
         <p :class="{ diminished: !alphaCorrect, correct: alphaCorrect }">
-          アルファベット: {{ alphaInput }}
+          英数: {{ alphaInput }}
           {{ alphaCorrect ? "⭕" : "" }}
         </p>
         <p :class="{ diminished: !kanaCorrect, correct: kanaCorrect }">
@@ -131,7 +131,7 @@
         <blockquote>{{ displayedProblem }}/{{ pendingProblem }}</blockquote>
         <p class="diminished">シンキングタイム: {{ Math.ceil(inputTimer / 1000) }}</p>
         <p class="diminished">
-          アルファベット: {{ alphaInput }}
+          英数: {{ alphaInput }}
         </p>
         <p class="diminished">
           かな: {{ kanaInput }}{{ pendingInput }}
