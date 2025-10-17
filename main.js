@@ -1,6 +1,15 @@
 var TICK_INTERVAL = 150;  /* msec */
 var INPUT_TIMER   = 5000; /* msec */
 
+function shuffleArray (array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var r = Math.floor(Math.random() * (i + 1));
+        var tmp = array[i];
+        array[i] = array[r];
+        array[r] = tmp;
+    }
+}
+
 var STATES = {
     INTRO: 0,
     READING: 1,
@@ -79,6 +88,9 @@ var vm = new Vue({
         },
         keyDown: function (key) {
             if (this.state === STATES.INTRO && key === " ") {
+                if (this.problems.shuffle) {
+                    shuffleArray(this.problems.problems);
+                }
                 this.initProblem(0);
                 return;
             }
