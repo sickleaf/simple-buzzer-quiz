@@ -101,6 +101,9 @@ var vm = new Vue({
             if (this.state === STATES.INPUT) {
                 if (!this.kanaError && key.match(/^[a-z-]$/)) {
                     var v = ROMAJI[this.pendingInput.concat(key)];
+                    for (let i = 1; i <= this.pendingInput.length && !v; i++) {
+                        v = ROMAJI[this.pendingInput.slice(i).concat(key)];
+                    }
                     if (v) {
                         this.kanaInput = this.kanaInput.concat(v[0]);
                         this.pendingInput = v[1];
