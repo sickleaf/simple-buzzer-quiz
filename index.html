@@ -33,8 +33,7 @@
 
       <header>
         <h1>
-          早押し検定
-          <span v-if="problems">"{{ problems.title }}"</span>
+          早押し検定 〜 <span v-if="problems">{{ problems.title }}</span>
         </h1>
         <p v-if="problems">
           作問:
@@ -64,7 +63,7 @@
           <li>「かな入力」には対応していません。ゴメンナサイ</li>
           <li>
             操作方法が不安な場合、まずは
-            <a href="https://zk-phi.github.io/simple-buzzer-quiz/">こちらのサンプル問題</a>
+            <a target="_blank" href="https://zk-phi.github.io/simple-buzzer-quiz/">サンプル問題</a>
             をどうぞ。
           </li>
         </ul>
@@ -72,6 +71,7 @@
         <ul>
           <li>タイピング速度はスコアに関係ありません。</li>
           <li>タイプミスは不正解になるので、落ち着いて入力してください。</li>
+          <li>オリジナル問題で遊びたい方は<a target="_blank" href="./json.html">こちら</a>。</li>
         </ul>
         <hr />
         <p v-if="problems">[Space] でスタート</p>

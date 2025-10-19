@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>早押し検定</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="早押しクイズができます" />
+    <link rel="stylesheet" href="new.min.css">
+  </head>
+
+  <body>
+    <header>
+      <h1>早押し検定 〜 問題データの作り方</h1>
+    </header>
+
+    <h3>データの形式</h3>
+
+    <p>
+      以下の形式の JSON ファイルを開くことができます。
+      <a target="_blank" href="https://github.com/zk-phi/simple-buzzer-quiz/blob/gh-pages/problems.json">サンプル</a>
+    </p>
+
+    <ul>
+      <li>title: 問題セットのタイトル（文字列）</li>
+      <li>
+        author: 問題の作者情報
+        <ul>
+          <li>text: 作者の名前（文字列）</li>
+          <li>url: ホームページなどの URL（文字列）</li>
+        </ul>
+      </li>
+      <li>shuffle: 出題順をシャッフルする場合は true（省略可）</li>
+      <li>
+        problems: 問題オブジェクトの配列
+        <ul>
+          <li>body: 問題の本文（文字列）</li>
+          <li>answers: 正解とする入力の一覧（文字列の配列）</li>
+          <li>displayAnswer: 画面に表示する正答（文字列）</li>
+          <li>explanation: 補足解説（文字列・省略可）</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h3>データの読み込みかた</h3>
+
+    <p>
+      "https://zk-phi.github.io/simple-buzzer-quiz/?" の後ろに、 JSON ファイルの URL を書いて下さい（"https://" は不要）。
+    </p>
+    <p>
+      例：<a target="_blank" href="https://zk-phi.github.io/simple-buzzer-quiz/?raw.githubusercontent.com/zk-phi/simple-buzzer-quiz/refs/heads/gh-pages/problems.json">https://zk-phi.github.io/simple-buzzer-quiz/?raw.githubusercontent.com/zk-phi/simple-buzzer-quiz/refs/heads/gh-pages/problems.json</a>
+    </p>
+    <p>
+      作成した問題は、SNS やホームページなどで自由に共有していただいて構いません。
+    </p>
+  </body>
+
+</html>
