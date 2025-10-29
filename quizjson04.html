@@ -66,6 +66,10 @@
       <input id="authorUrl" type="url" placeholder="例：https://booth.pm/ja/items/1918432" />
     </div>
     <div class="row">
+      <label for="description">description</label>
+      <input id="description" type="text" placeholder="空ならプロパティを省略" />
+    </div>
+    <div class="row">
       <label for="shuffle">shuffle</label>
       <select id="shuffle">
         <option value="omit" selected>（省略する）</option>
@@ -241,6 +245,7 @@
         const title = $('#title').val().trim();
         const authorText = $('#authorText').val().trim();
         const authorUrl = $('#authorUrl').val().trim();
+        const description = $('#description').val().trim();
         const shuffleSel = $('#shuffle').val();
 
         const errs = [];
@@ -271,6 +276,7 @@
         if (errs.length) throw new Error(errs.join('\n'));
 
         const root = { title, author: { text: authorText, url: authorUrl }, problems };
+        if (description !== '') root.description = description;
         if (shuffleSel === 'true') root.shuffle = true;
         if (shuffleSel === 'false') root.shuffle = false;
         return root;
@@ -311,6 +317,7 @@
         if (!Array.isArray(obj.problems)) throw new Error('JSONに problems 配列がありません。');
 
         $('#title').val(obj.title);
+        $('#description').val(obj.description ?? '');
         $('#authorText').val(obj.author.text);
         $('#authorUrl').val(obj.author.url);
         if (typeof obj.shuffle === 'boolean') $('#shuffle').val(String(obj.shuffle)); else $('#shuffle').val('omit');
