@@ -177,6 +177,7 @@ var vm = new Vue({
           }
         }
         if (!this.alphaError && key.match(/^[0-9a-z]$/)) {
+          stopSound(SOUNDS.TIMER);
           this.alphaInput = this.alphaInput.concat(key);
           this.inputTimer = INPUT_TIMER;
           var alphaIsValid = this.problems.problems[this.problemId].answers.some(function (ans) {
