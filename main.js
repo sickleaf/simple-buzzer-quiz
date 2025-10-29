@@ -112,7 +112,6 @@ var vm = new Vue({
       this.inputTimer = INPUT_TIMER;
     },
     inputCorrect: function () {
-      stopSound(SOUNDS.TIMER);
       playSound(SOUNDS.CORRECT);
       this.history = this.history.concat([{
         problem: this.displayedProblem,
@@ -150,6 +149,7 @@ var vm = new Vue({
       }
       if (this.state === STATES.INPUT) {
         if (!this.kanaError && key.match(/^[a-z-]$/)) {
+          stopSound(SOUNDS.TIMER);
           var v = ROMAJI[this.pendingInput.concat(key)];
           for (let i = 1; i <= this.pendingInput.length && !v; i++) {
             v = ROMAJI[this.pendingInput.slice(i).concat(key)];
