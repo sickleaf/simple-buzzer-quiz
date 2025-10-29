@@ -169,7 +169,6 @@ var vm = new Vue({
             });
             if (kanaIsCorrect) {
               this.kanaCorrect = true;
-              this.inputCorrect();
             }
           } else {
             this.pendingInput += key;
@@ -191,8 +190,10 @@ var vm = new Vue({
           });
           if (alphaIsCorrect) {
             this.alphaCorrect = true;
-            this.inputCorrect();
           }
+        }
+        if (this.kanaCorrect || this.alphaCorrect) {
+          this.inputCorrect();
         }
         if (this.kanaError && this.alphaError) {
           this.inputError();
