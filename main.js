@@ -87,7 +87,7 @@ var vm = new Vue({
       this.state = STATES.ERROR;
     },
     keyDown: function (key) {
-      if (this.state === STATES.INTRO && key === " ") {
+      if (this.state === STATES.INTRO && key === " " && this.problems) {
         if (this.problems.shuffle) {
           shuffleArray(this.problems.problems);
         }
