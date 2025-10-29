@@ -26,6 +26,7 @@ var vm = new Vue({
     state: STATES.INTRO,
     score: 0,
     correctCount: 0,
+    history: [],
     scoreDiff: 200,
     problems: null,
     loadError: false,
@@ -56,10 +57,17 @@ var vm = new Vue({
     xhr.send(null);
   },
   computed: {
-    shareText: function () {
-      return this.problems.title + "で" + this.score + "点" +
-             "(正答数" + this.correctCount + "/" + this.problems.problems.length + ")" +
-             "を獲得しました！ " + location.href;
+    shareUrl: function () {
+      return "https://twitter.com/intent/tweet?text=" +
+             this.problems.title + "で" + this.score + "点を獲得した！" +
+             "（正答数" + this.correctCount + "/" + this.problems.problems.length + "）" +
+             location.href;
+    },
+  },
+  filters: {
+    toShareUrl: function (problem) {
+      return "https://twitter.com/intent/tweet?text=" +
+             "「" + problem + "」に正解した！" + location.href;
     },
   },
   methods: {
@@ -67,6 +75,7 @@ var vm = new Vue({
       this.state = STATES.INTRO;
       this.score = 0;
       this.correctCount = 0;
+      this.history = [];
     },
     initProblem: function (problemId) {
       this.state = STATES.READING;
@@ -79,11 +88,19 @@ var vm = new Vue({
       this.inputTimer = INPUT_TIMER;
     },
     inputCorrect: function () {
+      this.history = this.history.concat([{
+        problem: this.displayedProblem,
+        correct: true,
+      }]);
       this.score += this.scoreDiff;
       this.correctCount += 1;
       this.state = STATES.CORRECT;
     },
     inputError: function () {
+      this.history = this.history.concat([{
+        problem: this.displayedProblem,
+        correct: false,
+      }]);
       this.state = STATES.ERROR;
     },
     keyDown: function (key) {
@@ -95,6 +112,7 @@ var vm = new Vue({
         return;
       }
       if (this.state === STATES.READING && key === " ") {
+        this.displayedProblem += "/";
         this.state = STATES.INPUT;
         return;
       }

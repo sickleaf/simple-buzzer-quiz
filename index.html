@@ -93,7 +93,7 @@
         <h2>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h2>
         <p>現在スコア {{ score }} <span v-if="scoreDiff">(+ {{ scoreDiff }})</span></p>
         <blockquote>
-          {{ displayedProblem }}/<span class="hidden">{{ pendingProblem }}</span>
+          {{ displayedProblem }}<span class="hidden">{{ pendingProblem }}</span>
         </blockquote>
         <p>シンキングタイム: {{ Math.floor(inputTimer / 1000) }}</p>
         <p :class="{ diminished: alphaError }">
@@ -109,7 +109,7 @@
       <div v-if="state === STATES.CORRECT">
         <h2>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h2>
         <p>現在スコア {{ score }} <span v-if="scoreDiff" class="correct">(+{{ scoreDiff }})</span></p>
-        <blockquote>{{ displayedProblem }}/{{ pendingProblem }}</blockquote>
+        <blockquote>{{ displayedProblem }}{{ pendingProblem }}</blockquote>
         <p class="diminished">シンキングタイム: {{ Math.floor(inputTimer / 1000) }}</p>
         <p :class="{ diminished: !alphaCorrect, correct: alphaCorrect }">
           英数: {{ alphaInput }}
@@ -128,7 +128,7 @@
       <div v-if="state === STATES.ERROR">
         <h2>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h2>
         <p>現在スコア {{ score }} <span v-if="scoreDiff" class="diminished">(+ {{ scoreDiff }})</span></p>
-        <blockquote>{{ displayedProblem }}/{{ pendingProblem }}</blockquote>
+        <blockquote>{{ displayedProblem }}{{ pendingProblem }}</blockquote>
         <p class="diminished">シンキングタイム: {{ Math.floor(inputTimer / 1000) }}</p>
         <p class="diminished">
           英数: {{ alphaInput }}
@@ -147,8 +147,22 @@
         <p>おつかれさまでした！</p>
         <p>
           スコア: {{ score }} 点 (正答数 {{ correctCount }}/{{ problems.problems.length }})
-          <a target="_blank" :href="'https://twitter.com/intent/tweet?text=' + shareText">Tweet</a>
+          <a target="_blank" :href="shareUrl">Tweet</a>
         </p>
+        <h3>問題一覧</h3>
+        <table>
+          <tbody>
+            <tr v-for="row in history">
+              <td>{{ row.problem }}</td>
+              <td v-if="row.correct">
+                ⭕ <a target="_blank" :href="row.problem | toShareUrl">Tweet</a>
+              </td>
+              <td v-else>
+                ❌
+              </td>
+            </tr>
+          </tbody>
+        </table>
         <hr />
         <p>[Space] で最初に戻る</p>
       </div>
