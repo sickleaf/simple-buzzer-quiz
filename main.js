@@ -70,9 +70,8 @@ var vm = new Vue({
     inputTimer: null,
   },
   mounted: function () {
-    this.keyListenerObj = function (e) { vm.keyDown(e.key) };
-    this.timerObj = setInterval(this.tick, TICK_INTERVAL);
-    window.addEventListener('keydown', this.keyListenerObj);
+    setInterval(this.tick, TICK_INTERVAL);
+    window.addEventListener("keydown", (e) => vm.keyDown(e.key));
     // ---- load problems.json
     var match = location.href.match(/\?(.+)$/);
     var xhr   = new XMLHttpRequest();
@@ -133,8 +132,12 @@ var vm = new Vue({
       }]);
       this.state = STATES.ERROR;
     },
+    startInput: function () {
+      playSound(SOUNDS.TIMER);
+      this.state = STATES.INPUT;
+    },
     keyDown: function (key) {
-      if (this.state === STATES.INTRO && key === " " && this.problems) {
+      if (this.state === STATES.INTRO && this.problems && key === " ") {
         if (this.problems.shuffle) {
           shuffleArray(this.problems.problems);
         }
@@ -143,9 +146,8 @@ var vm = new Vue({
       }
       if (this.state === STATES.READING && key === " ") {
         playSound(SOUNDS.ANSWER);
-        playSound(SOUNDS.TIMER);
         this.displayedProblem += "/";
-        this.state = STATES.INPUT;
+        this.startInput();
         return;
       }
       if (this.state === STATES.INPUT && key.match(/^[a-z0-9-]$/)) {
@@ -223,8 +225,7 @@ var vm = new Vue({
           var total = this.problems.problems[this.problemId].body.length;
           this.scoreDiff = 100 + Math.floor(this.pendingProblem.length / total * 100);
         } else {
-          playSound(SOUNDS.TIMER);
-          this.state = STATES.INPUT;
+          this.startInput();
         }
         return;
       }
