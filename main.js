@@ -124,7 +124,6 @@ var vm = new Vue({
       this.state = STATES.CORRECT;
     },
     inputError: function () {
-      stopSound(SOUNDS.TIMER);
       if (this.inputTimer > 0 || this.pendingProblem !== "") {
         playSound(SOUNDS.WRONG);
       }
