@@ -41,6 +41,7 @@ var SOUNDS = {
   TIMER: loadAudio("./assets/timer.mp3"),
   WRONG: loadAudio("./assets/wrong.mp3"),
   COMPLETED: loadAudio("./assets/completed.mp3"),
+  KEY: loadAudio("./assets/key.mp3"),
 };
 
 var vm = new Vue({
@@ -148,9 +149,10 @@ var vm = new Vue({
         this.state = STATES.INPUT;
         return;
       }
-      if (this.state === STATES.INPUT) {
-        if (!this.kanaError && key.match(/^[a-z-]$/)) {
-          stopSound(SOUNDS.TIMER);
+      if (this.state === STATES.INPUT && key.match(/^[a-z0-9-]$/)) {
+        stopSound(SOUNDS.TIMER);
+        playSound(SOUNDS.KEY);
+        if (!this.kanaError) {
           var v = ROMAJI[this.pendingInput.concat(key)];
           for (let i = 1; i <= this.pendingInput.length && !v; i++) {
             v = ROMAJI[this.pendingInput.slice(i).concat(key)];
@@ -176,8 +178,7 @@ var vm = new Vue({
             this.kanaError = true;
           }
         }
-        if (!this.alphaError && key.match(/^[0-9a-z]$/)) {
-          stopSound(SOUNDS.TIMER);
+        if (!this.alphaError) {
           this.alphaInput = this.alphaInput.concat(key);
           this.inputTimer = INPUT_TIMER;
           var alphaIsValid = this.problems.problems[this.problemId].answers.some(function (ans) {
