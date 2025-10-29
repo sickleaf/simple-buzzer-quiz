@@ -235,10 +235,10 @@
             <tr v-for="row in history">
               <td>{{ row.problem }}</td>
               <td v-if="row.correct">
-                ⭕ <a target="_blank" :href="row.problem | toShareUrl">Tweet</a>
+                ⭕ <a target="_blank" :href="row.problem | toShareUrlCorrect">Tweet</a>
               </td>
               <td v-else>
-                ❌
+                ❌ <a target="_blank" :href="row.problem | toShareUrlWrong">Tweet</a>
               </td>
             </tr>
           </tbody>
