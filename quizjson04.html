@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>問題セット JSON 生成フォーム</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <style>
+    :root { --fg:#222; --muted:#666; --bd:#ddd; --bg:#fafafa; --prim:#2563eb; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans JP", sans-serif; color:var(--fg); margin: 24px; }
+    h1 { font-size: 1.4rem; margin: 0 0 12px; }
+    h2 { font-size: 1.1rem; margin: 24px 0 8px; }
+    fieldset { border: 1px solid var(--bd); border-radius: 10px; padding: 16px; background: #fff; }
+    .row { display: grid; grid-template-columns: 140px 1fr; gap: 10px; align-items: center; margin: 8px 0; }
+    .row label { color: var(--muted); font-size: 0.95rem; }
+    input[type="text"], input[type="url"], textarea, select {
+      width: 100%; padding: 8px 10px; border: 1px solid var(--bd); border-radius: 8px; background: var(--bg);
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    .btn { appearance: none; border: 1px solid var(--bd); background:#fff; padding:8px 12px; border-radius: 999px; cursor:pointer; }
+    .btn.primary { background: var(--prim); color:#fff; border-color: transparent; }
+    .btn.ghost { background: transparent; }
+    .btn.small { padding:6px 10px; font-size: 0.9rem; }
+    .toolbar { display:flex; gap:8px; flex-wrap:wrap; }
+    .muted { color: var(--muted); font-size: 0.9rem; }
+    .output { white-space: pre; background: #111; color:#e8e8e8; padding:16px; border-radius:10px; overflow:auto; max-height: 50vh; }
+    .hint { font-size: 0.85rem; color: var(--muted); }
+    .import-bar { display:flex; gap:10px; align-items:center; margin: 4px 0 14px; }
+
+    /* 問題カード */
+    .problem { border: 1px solid var(--bd); border-radius: 10px; padding: 12px; background: #fff; }
+    .problem .head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+    .problem .title { font-weight:600; color:#333; }
+
+    /* ページャ */
+    .pager { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin: 10px 0 12px; }
+    .pager .pagebtn { border:1px solid var(--bd); background:#fff; padding:6px 10px; border-radius:8px; cursor:pointer; }
+    .pager .pagebtn.active { background: var(--prim); color:#fff; border-color: transparent; }
+    .pager .spacer { flex: 0 0 8px; }
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+  <h1>問題セット JSON 生成</h1>
+
+  <!-- 機能追加１：JSON読み込み -->
+  <div class="import-bar">
+    <button id="loadJsonBtn" class="btn">📥 JSON読み込み</button>
+    <input id="loadJsonFile" type="file" accept="application/json,.json" style="display:none" />
+    <span class="muted">既存のJSONファイルを読み込んでフォームへ反映します。</span>
+  </div>
+
+  <!-- セット情報 -->
+  <fieldset>
+    <legend>セット情報</legend>
+    <div class="row">
+      <label for="title">title</label>
+      <input id="title" type="text" placeholder="例：サンプル問題" />
+    </div>
+    <div class="row">
+      <label for="authorText">author.text</label>
+      <input id="authorText" type="text" placeholder="例：木月リアさんの問題集から引用" />
+    </div>
+    <div class="row">
+      <label for="authorUrl">author.url</label>
+      <input id="authorUrl" type="url" placeholder="例：https://booth.pm/ja/items/1918432" />
+    </div>
+    <div class="row">
+      <label for="shuffle">shuffle</label>
+      <select id="shuffle">
+        <option value="omit" selected>（省略する）</option>
+        <option value="true">true</option>
+        <option value="false">false</option>
+      </select>
+    </div>
+    <div class="hint">※ shuffle は仕様上「省略可」。必要な場合のみ true/false を選択してください。</div>
+  </fieldset>
+
+  <!-- 問題配列（ページャ方式） -->
+  <h2>problems（可変配列・1問表示）</h2>
+
+  <!-- ページャ -->
+  <div class="pager" id="pager">
+    <button class="pagebtn" id="prevPage">◀ 前</button>
+    <span class="spacer"></span>
+    <span id="pageNumbers" class="toolbar"></span>
+    <span class="spacer"></span>
+    <button class="pagebtn" id="nextPage">次 ▶</button>
+    <span class="muted" id="pageInfo" style="margin-left:8px;"></span>
+  </div>
+
+  <div class="toolbar" style="margin-bottom:10px;">
+    <button id="addProblem" class="btn">＋ 問題を追加</button>
+    <span class="muted">answers は「カンマ」または「改行」で複数入力できます。空欄は無視されます。</span>
+  </div>
+
+  <!-- ここに複数の .problem を保持するが、表示は1件のみ -->
+  <div id="problems"></div>
+
+  <!-- 生成・出力操作（機能追加３ 含む） -->
+  <div class="toolbar" style="margin-top:16px;">
+    <button id="generate" class="btn primary">JSONを生成</button>
+    <button id="copyJson" class="btn">JSONデータをコピー</button>
+    <button id="downloadJson" class="btn">jsonをダウンロード</button>
+    <button id="clearOutput" class="btn ghost">出力をクリア</button>
+  </div>
+
+  <h2>出力（JSON / ページ内表示）</h2>
+  <div id="output" class="output" aria-live="polite"></div>
+
+  <!-- 問題テンプレート -->
+  <template id="problem-template">
+    <div class="problem" data-index="">
+      <div class="head">
+        <div class="title">問題 <span class="idx"></span></div>
+        <div class="toolbar">
+          <!-- 機能追加２：左右矢印に変更 -->
+          <button class="btn small moveLeft" title="前へ移動">←</button>
+          <button class="btn small moveRight" title="次へ移動">→</button>
+          <button class="btn small remove" title="削除">削除</button>
+        </div>
+      </div>
+      <div class="row">
+        <label>body</label>
+        <textarea class="body" placeholder="問題文を入力"></textarea>
+      </div>
+      <div class="row">
+        <label>answers</label>
+        <textarea class="answers" placeholder="カンマ または 改行で複数指定&#10;例) えべれすと, everest"></textarea>
+      </div>
+      <div class="row">
+        <label>displayAnswer</label>
+        <input type="text" class="displayAnswer" placeholder="画面表示用の正答" />
+      </div>
+      <div class="row">
+        <label>explanation（省略可）</label>
+        <textarea class="explanation" placeholder="空ならプロパティを省略"></textarea>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    $(function() {
+      const $problems = $('#problems');
+      const $pager = $('#pager');
+      const $pageNumbers = $('#pageNumbers');
+      const $pageInfo = $('#pageInfo');
+      const tpl = document.getElementById('problem-template');
+      let currentIndex = 0; // 0-based
+
+      function totalProblems() { return $problems.children('.problem').length; }
+
+      function renumber() {
+        $problems.children('.problem').each(function(i) {
+          $(this).attr('data-index', i+1);
+          $(this).find('.idx').text(i+1);
+        });
+      }
+
+      function refreshPager() {
+        const n = totalProblems();
+        $pageNumbers.empty();
+        for (let i = 0; i < n; i++) {
+          const btn = $('<button/>', { class: 'pagebtn', text: (i+1) });
+          if (i === currentIndex) btn.addClass('active');
+          btn.on('click', () => showOnly(i));
+          $pageNumbers.append(btn);
+        }
+        $('#prevPage').prop('disabled', currentIndex <= 0);
+        $('#nextPage').prop('disabled', currentIndex >= n - 1);
+        $pageInfo.text(n ? `（${currentIndex+1} / ${n}）` : '（0 / 0）');
+      }
+
+      function showOnly(index) {
+        const n = totalProblems();
+        if (n === 0) return;
+        if (index < 0) index = 0;
+        if (index > n - 1) index = n - 1;
+        currentIndex = index;
+        $problems.children('.problem').each(function(i) {
+          $(this).toggleClass('hidden', i !== currentIndex);
+        });
+        refreshPager();
+      }
+
+      function addProblem(prefill = {}) {
+        const node = tpl.content.firstElementChild.cloneNode(true);
+        const $node = $(node);
+        if (prefill.body) $node.find('.body').val(prefill.body);
+        if (prefill.answers) $node.find('.answers').val(prefill.answers);
+        if (prefill.displayAnswer) $node.find('.displayAnswer').val(prefill.displayAnswer);
+        if (prefill.explanation) $node.find('.explanation').val(prefill.explanation);
+
+        // 削除
+        $node.on('click', '.remove', function() {
+          const idx = $node.index();
+          $node.remove();
+          renumber();
+          const n = totalProblems();
+          if (n === 0) { refreshPager(); return; }
+          // 削除した位置に合わせて表示先を調整
+          if (idx <= currentIndex) currentIndex = Math.max(0, currentIndex - 1);
+          showOnly(currentIndex);
+        });
+
+        // ←：前へ（DOMで前に移動）
+        $node.on('click', '.moveLeft', function() {
+          const prev = $node.prev('.problem');
+          if (prev.length) {
+            $node.insertBefore(prev);
+            renumber();
+            currentIndex = $node.index();
+            showOnly(currentIndex);
+          }
+        });
+
+        // →：次へ（DOMで後ろに移動）
+        $node.on('click', '.moveRight', function() {
+          const next = $node.next('.problem');
+          if (next.length) {
+            $node.insertAfter(next);
+            renumber();
+            currentIndex = $node.index();
+            showOnly(currentIndex);
+          }
+        });
+
+        $problems.append($node);
+        renumber();
+        // 追加した問題へジャンプ
+        currentIndex = totalProblems() - 1;
+        showOnly(currentIndex);
+      }
+
+      function parseAnswers(text) {
+        if (!text) return [];
+        return text.replace(/\r\n/g, '\n').split(/[,|\n]/).map(s => s.trim()).filter(Boolean);
+      }
+
+      function buildJson() {
+        const title = $('#title').val().trim();
+        const authorText = $('#authorText').val().trim();
+        const authorUrl = $('#authorUrl').val().trim();
+        const shuffleSel = $('#shuffle').val();
+
+        const errs = [];
+        if (!title) errs.push('title は必須です。');
+        if (!authorText) errs.push('author.text は必須です。');
+        if (!authorUrl) errs.push('author.url は必須です。');
+
+        const problems = [];
+        $problems.children('.problem').each(function() {
+          const body = $(this).find('.body').val().trim();
+          const answers = parseAnswers($(this).find('.answers').val());
+          const displayAnswer = $(this).find('.displayAnswer').val().trim();
+          const explanation = $(this).find('.explanation').val().trim();
+
+          // 完全空はスキップ
+          if (!body && !answers.length && !displayAnswer && !explanation) return;
+
+          if (!body) errs.push('問題の body は必須です。');
+          if (!answers.length) errs.push('問題の answers は1つ以上必要です。');
+          if (!displayAnswer) errs.push('問題の displayAnswer は必須です。');
+
+          const item = { body, answers, displayAnswer };
+          if (explanation) item.explanation = explanation;
+          problems.push(item);
+        });
+
+        if (problems.length === 0) errs.push('problems は1件以上必要です。');
+        if (errs.length) throw new Error(errs.join('\n'));
+
+        const root = { title, author: { text: authorText, url: authorUrl }, problems };
+        if (shuffleSel === 'true') root.shuffle = true;
+        if (shuffleSel === 'false') root.shuffle = false;
+        return root;
+      }
+
+      function showOutput(obj) {
+        const json = JSON.stringify(obj, null, 2);
+        $('#output').text(json);
+      }
+
+      // 出力取得（空なら生成）
+      function getOutputJsonOrBuild() {
+        const existing = $('#output').text().trim();
+        if (existing) return existing;
+        const data = buildJson();
+        const json = JSON.stringify(data, null, 2);
+        $('#output').text(json);
+        return json;
+      }
+
+      // ファイル名生成
+      function makeFilename() {
+        const title = ($('#title').val() || 'quizset').trim();
+        const safe = title.replace(/[\\/:*?"<>|]/g, '_').slice(0, 60) || 'quizset';
+        const d = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        const y = d.getFullYear(), m = pad(d.getMonth()+1), day = pad(d.getDate()), hh = pad(d.getHours()), mm = pad(d.getMinutes());
+        return `${safe}_${y}${m}${day}-${hh}${mm}.json`;
+      }
+
+      // === 機能追加１：JSONインポート ===
+      function importFromJson(obj) {
+        if (typeof obj !== 'object' || obj === null) throw new Error('JSONの形式が不正です。');
+        if (!obj.title) throw new Error('JSONに title がありません。');
+        if (!obj.author || typeof obj.author !== 'object') throw new Error('JSONに author オブジェクトがありません。');
+        if (!obj.author.text) throw new Error('JSONに author.text がありません。');
+        if (!obj.author.url) throw new Error('JSONに author.url がありません。');
+        if (!Array.isArray(obj.problems)) throw new Error('JSONに problems 配列がありません。');
+
+        $('#title').val(obj.title);
+        $('#authorText').val(obj.author.text);
+        $('#authorUrl').val(obj.author.url);
+        if (typeof obj.shuffle === 'boolean') $('#shuffle').val(String(obj.shuffle)); else $('#shuffle').val('omit');
+
+        $problems.empty();
+        (obj.problems || []).forEach(p => {
+          const body = p?.body ?? '';
+          const answersArr = Array.isArray(p?.answers) ? p.answers : [];
+          const displayAnswer = p?.displayAnswer ?? '';
+          const explanation = typeof p?.explanation === 'string' ? p.explanation : '';
+          addProblem({ body, answers: answersArr.join(', '), displayAnswer, explanation });
+        });
+
+        if (totalProblems() === 0) addProblem(); // 念のため最低1問
+        showOnly(0);
+        showOutput(obj);
+      }
+
+      $('#loadJsonBtn').on('click', () => { $('#loadJsonFile').val(''); $('#loadJsonFile').trigger('click'); });
+      $('#loadJsonFile').on('change', function(e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function() {
+          try { importFromJson(JSON.parse(String(reader.result || ''))); }
+          catch (err) { alert('JSONの読み込みに失敗しました：\n' + (err?.message || err)); }
+        };
+        reader.onerror = function() { alert('ファイルの読み込みに失敗しました。'); };
+        reader.readAsText(file, { type: 'application/json' });
+      });
+      // === 機能追加１ ここまで ===
+
+      // 初期：1問作成＆1問表示
+      addProblem();
+
+      // 追加
+      $('#addProblem').on('click', function() { addProblem(); });
+
+      // ページャ操作
+      $('#prevPage').on('click', function() { showOnly(currentIndex - 1); });
+      $('#nextPage').on('click', function() { showOnly(currentIndex + 1); });
+
+      // 生成・出力
+      $('#generate').on('click', function() {
+        try {
+          const data = buildJson();
+          showOutput(data);
+          document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (e) { alert(e.message || e); }
+      });
+      $('#clearOutput').on('click', function() { $('#output').empty(); });
+
+      // 機能追加３：コピー & ダウンロード
+      $('#copyJson').on('click', async function() {
+        try {
+          const json = getOutputJsonOrBuild();
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(json);
+          } else {
+            const ta = $('<textarea>').val(json).css({ position: 'fixed', left: '-9999px', top: '0' }).appendTo('body')[0];
+            ta.select(); document.execCommand('copy'); $(ta).remove();
+          }
+          alert('JSONをクリップボードにコピーしました。');
+        } catch (e) { alert('コピーに失敗しました：\n' + (e?.message || e)); }
+      });
+
+      $('#downloadJson').on('click', function() {
+        try {
+          const json = getOutputJsonOrBuild();
+          const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = makeFilename(); document.body.appendChild(a); a.click(); a.remove();
+          URL.revokeObjectURL(url);
+        } catch (e) { alert('ダウンロードに失敗しました：\n' + (e?.message || e)); }
+      });
+
+      // 初回描画
+      refreshPager();
+    });
+  </script>
+</body>
+</html>
+
