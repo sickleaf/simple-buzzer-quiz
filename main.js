@@ -10,21 +10,6 @@ function shuffleArray (array) {
   }
 }
 
-function loadAudio (path) {
-  const audio = new Audio(path);
-  audio.preload = "auto";
-  return audio;
-}
-
-function playSound (audio) {
-  audio.currentTime = 0;
-  audio.play();
-}
-
-function stopSound (audio) {
-  audio.pause();
-}
-
 var STATES = {
   INTRO: 0,
   READING: 1,
@@ -102,7 +87,7 @@ var vm = new Vue({
       this.history = [];
     },
     initProblem: function (problemId) {
-      playSound(SOUNDS.PROBLEM);
+      playAudio(SOUNDS.PROBLEM);
       this.state = STATES.READING;
       this.problemId = problemId;
       this.scoreDiff = 200;
@@ -113,7 +98,7 @@ var vm = new Vue({
       this.inputTimer = INPUT_TIMER;
     },
     inputCorrect: function () {
-      playSound(SOUNDS.CORRECT);
+      playAudio(SOUNDS.CORRECT);
       this.history = this.history.concat([{
         problem: this.displayedProblem,
         correct: true,
@@ -124,7 +109,7 @@ var vm = new Vue({
     },
     inputError: function () {
       if (this.inputTimer > 0 || this.pendingProblem !== "") {
-        playSound(SOUNDS.WRONG);
+        playAudio(SOUNDS.WRONG);
       }
       this.history = this.history.concat([{
         problem: this.displayedProblem,
@@ -133,7 +118,7 @@ var vm = new Vue({
       this.state = STATES.ERROR;
     },
     startInput: function () {
-      playSound(SOUNDS.TIMER);
+      playAudio(SOUNDS.TIMER);
       this.state = STATES.INPUT;
     },
     keyDown: function (key) {
@@ -145,14 +130,14 @@ var vm = new Vue({
         return;
       }
       if (this.state === STATES.READING && key === " ") {
-        playSound(SOUNDS.ANSWER);
+        playAudio(SOUNDS.ANSWER);
         this.displayedProblem += "/";
         this.startInput();
         return;
       }
       if (this.state === STATES.INPUT && key.match(/^[a-z0-9-]$/)) {
-        stopSound(SOUNDS.TIMER);
-        playSound(SOUNDS.KEY);
+        stopAudio(SOUNDS.TIMER);
+        playAudio(SOUNDS.KEY);
         if (!this.kanaError) {
           var v = ROMAJI[this.pendingInput.concat(key)];
           for (let i = 1; i <= this.pendingInput.length && !v; i++) {
@@ -207,7 +192,7 @@ var vm = new Vue({
         if (this.problemId + 1 < this.problems.problems.length) {
           this.initProblem(this.problemId + 1);
         } else {
-          playSound(SOUNDS.COMPLETED);
+          playAudio(SOUNDS.COMPLETED);
           this.state = STATES.RESULT;
         }
         return;
