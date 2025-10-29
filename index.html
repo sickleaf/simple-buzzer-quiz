@@ -163,7 +163,7 @@
         <h2>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h2>
         <p>現在スコア {{ score }} <span v-if="scoreDiff">(+ {{ scoreDiff }})</span></p>
         <blockquote>
-          {{ displayedProblem }}<span class="hidden">/{{ pendingProblem }}</span>
+          {{ displayedProblem }}<span class="hidden">{{ pendingProblem }}</span>
         </blockquote>
         <hr />
         <p>[Space] で回答開始</p>
@@ -180,7 +180,7 @@
           英数: {{ alphaInput }}|
         </p>
         <p :class="{ diminished: kanaError }">
-          かな: {{ kanaInput }}{{ pendingInput }}|
+          かな: {{ kanaInput }}{{ pendingKana }}|
         </p>
         <hr />
         <p>キーボードで回答を入力</p>
@@ -196,7 +196,7 @@
           {{ alphaCorrect ? "⭕" : "" }}
         </p>
         <p :class="{ diminished: !kanaCorrect, correct: kanaCorrect }">
-          かな: {{ kanaInput }}{{ pendingInput }}
+          かな: {{ kanaInput }}{{ pendingKana }}
           {{ kanaCorrect ? "⭕" : "" }}
         </p>
         <p>A. {{ problems.problems[problemId].displayAnswer }}</p>
@@ -214,7 +214,7 @@
           英数: {{ alphaInput }}
         </p>
         <p class="diminished">
-          かな: {{ kanaInput }}{{ pendingInput }}
+          かな: {{ kanaInput }}{{ pendingKana }}
         </p>
         <p>A. {{ problems.problems[problemId].displayAnswer }}</p>
         <small>{{ problems.problems[problemId].explanation }}</small>

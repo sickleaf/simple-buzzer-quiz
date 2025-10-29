@@ -1,6 +1,6 @@
-var TICK_INTERVAL = 125;  /* msec */
-var INPUT_TIMER   = 5999; /* msec */
-var IS_TOUCH = "ontouchstart" in window;
+const TICK_INTERVAL = 125;  /* msec */
+const INPUT_TIMER   = 5999; /* msec */
+const IS_TOUCH = "ontouchstart" in window;
 
 function shuffleArray (array) {
   for (var i = array.length - 1; i > 0; i--) {
@@ -11,7 +11,7 @@ function shuffleArray (array) {
   }
 }
 
-var STATES = {
+const STATES = {
   INTRO: 0,
   READING: 1,
   INPUT: 2,
@@ -20,7 +20,7 @@ var STATES = {
   RESULT: 5,
 };
 
-var SOUNDS = {
+const SOUNDS = {
   ANSWER: loadAudio("./assets/answer.mp3"),
   CORRECT: loadAudio("./assets/correct.mp3"),
   PROBLEM: loadAudio("./assets/problem.mp3"),
@@ -30,25 +30,25 @@ var SOUNDS = {
   KEY: loadAudio("./assets/key.mp3"),
 };
 
-var vm = new Vue({
+const vm = new Vue({
   el: "#app",
   data: {
+    problems: null,
+    loadError: false,
     /* game */
     state: STATES.INTRO,
     score: 0,
     correctCount: 0,
     history: [],
-    scoreDiff: 200,
-    problems: null,
-    loadError: false,
     /* problem */
     problemId: null,
+    scoreDiff: 200,
     displayedProblem: null,
     pendingProblem: null,
     /* input */
     kanaInput: null,
     alphaInput: null,
-    pendingInput: null,
+    pendingKana: null,
     alphaError: null,
     alphaCorrect: null,
     kanaError: null,
@@ -58,13 +58,7 @@ var vm = new Vue({
   mounted: function () {
     setInterval(this.tick, TICK_INTERVAL);
     window.addEventListener("keydown", (e) => vm.keyDown(e.key));
-    // ---- load problems.json
-    var match = location.href.match(/\?(.+)$/);
-    var xhr   = new XMLHttpRequest();
-    xhr.onload = function () { vm.problems = JSON.parse(xhr.responseText); };
-    xhr.onerror = function () { vm.loadError = true; };
-    xhr.open("GET", match ? `https://${match[1]}` : "problems.json", true);
-    xhr.send(null);
+    this.loadProblems();
   },
   computed: {
     shareUrl: function () {
@@ -81,11 +75,22 @@ var vm = new Vue({
     },
   },
   methods: {
+    loadProblems: function () {
+      const match = location.href.match(/\?(.+)$/);
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () { vm.problems = JSON.parse(xhr.responseText); };
+      xhr.onerror = function () { vm.loadError = true; };
+      xhr.open("GET", match ? `https://${match[1]}` : "problems.json", true);
+      xhr.send(null);
+    },
     initGame: function () {
-      this.state = STATES.INTRO;
+      if (this.problems.shuffle) {
+        shuffleArray(this.problems.problems);
+      }
       this.score = 0;
       this.correctCount = 0;
       this.history = [];
+      this.initProblem(0);
     },
     initProblem: function (problemId) {
       playAudio(SOUNDS.PROBLEM);
@@ -94,14 +99,68 @@ var vm = new Vue({
       this.scoreDiff = 200;
       this.displayedProblem = "";
       this.pendingProblem = "問題:  " + this.problems.problems[problemId].body.normalize();
-      this.kanaInput = this.alphaInput = this.pendingInput = "";
-      this.alphaError = this.kanaError = this.alphaCorrect = this.kanaCorrect = false;
+    },
+    revealProblem: function () {
+      if (this.pendingProblem) {
+        this.displayedProblem = this.displayedProblem + this.pendingProblem[0];
+        this.pendingProblem = this.pendingProblem.slice(1);
+        const total = this.problems.problems[this.problemId].body.length;
+        this.scoreDiff = 100 + Math.floor(this.pendingProblem.length / total * 100);
+      } else {
+        this.startInput();
+      }
+    },
+    stopProblem: function () {
+      playAudio(SOUNDS.ANSWER);
+      this.startInput();
+    },
+    startInput: function () {
+      playAudio(SOUNDS.TIMER);
       this.inputTimer = INPUT_TIMER;
+      this.kanaInput = this.alphaInput = this.pendingKana = "";
+      this.alphaError = this.kanaError = this.alphaCorrect = this.kanaCorrect = false;
+      this.state = STATES.INPUT;
+    },
+    processInput: function (key) {
+      stopAudio(SOUNDS.TIMER);
+      playAudio(SOUNDS.KEY);
+      this.inputTimer = INPUT_TIMER;
+      if (!this.kanaError) {
+        [this.kanaInput, this.pendingKana] = inputRomaji(this.kanaInput, this.pendingKana, key);
+        this.kanaError = this.problems.problems[this.problemId].answers.every(
+          (ans) => !ans.startsWith(vm.kanaInput)
+        );
+        this.kanaCorrect = !this.kanaError && this.problems.problems[this.problemId].answers.some(
+          (ans) => ans === vm.kanaInput
+        );
+      }
+      if (!this.alphaError) {
+        this.alphaInput = this.alphaInput.concat(key);
+        this.alphaError = this.problems.problems[this.problemId].answers.every(
+          (ans) => !ans.startsWith(vm.alphaInput)
+        );
+        this.alphaCorrect = !this.alphaError && this.problems.problems[this.problemId].answers.some(
+          (ans) => ans === vm.alphaInput
+        );
+      }
+      if (this.kanaCorrect || this.alphaCorrect) {
+        this.inputCorrect();
+      }
+      if (this.kanaError && this.alphaError) {
+        this.inputError();
+      }
+    },
+    inputCountDown: function () {
+      this.inputTimer -= TICK_INTERVAL;
+      if (this.inputTimer <= 0) {
+        this.inputTimer = 0;
+        this.inputError();
+      }
     },
     inputCorrect: function () {
       playAudio(SOUNDS.CORRECT);
       this.history = this.history.concat([{
-        problem: this.displayedProblem,
+        problem: this.displayedProblem + (this.pendingProblem === "" ? "" : "/"),
         correct: true,
       }]);
       this.score += this.scoreDiff;
@@ -109,119 +168,44 @@ var vm = new Vue({
       this.state = STATES.CORRECT;
     },
     inputError: function () {
-      if (this.inputTimer > 0 || this.pendingProblem !== "") {
+      if (this.kanaInput !== "" || this.alphaInput !== "" || this.pendingProblem !== "") {
         playAudio(SOUNDS.WRONG);
       }
       this.history = this.history.concat([{
-        problem: this.displayedProblem,
+        problem: this.displayedProblem + (this.pendingProblem === "" ? "" : "/"),
         correct: false,
       }]);
       this.state = STATES.ERROR;
     },
-    startInput: function () {
-      playAudio(SOUNDS.TIMER);
-      this.state = STATES.INPUT;
+    nextProblem: function () {
+      if (this.problemId + 1 < this.problems.problems.length) {
+        this.initProblem(this.problemId + 1);
+      } else {
+        playAudio(SOUNDS.COMPLETED);
+        this.state = STATES.RESULT;
+      }
+    },
+    backToIntro: function () {
+      this.state = STATES.INTRO;
     },
     keyDown: function (key) {
       if (this.state === STATES.INTRO && this.problems && key === " ") {
-        if (this.problems.shuffle) {
-          shuffleArray(this.problems.problems);
-        }
-        this.initProblem(0);
-        return;
-      }
-      if (this.state === STATES.READING && key === " ") {
-        playAudio(SOUNDS.ANSWER);
-        this.displayedProblem += "/";
-        this.startInput();
-        return;
-      }
-      if (this.state === STATES.INPUT && key.match(/^[a-z0-9-]$/)) {
-        stopAudio(SOUNDS.TIMER);
-        playAudio(SOUNDS.KEY);
-        if (!this.kanaError) {
-          var v = ROMAJI[this.pendingInput.concat(key)];
-          for (let i = 1; i <= this.pendingInput.length && !v; i++) {
-            v = ROMAJI[this.pendingInput.slice(i).concat(key)];
-          }
-          if (v) {
-            this.kanaInput = this.kanaInput.concat(v[0]);
-            this.pendingInput = v[1];
-            this.inputTimer = INPUT_TIMER;
-            var kanaIsValid = this.problems.problems[this.problemId].answers.some(function (ans) {
-              return ans.match("^" + vm.kanaInput);
-            });
-            if (!kanaIsValid) {
-              this.kanaError = true;
-            }
-            var kanaIsCorrect = this.problems.problems[this.problemId].answers.some(function (ans) {
-              return ans === vm.kanaInput;
-            });
-            if (kanaIsCorrect) {
-              this.kanaCorrect = true;
-            }
-          } else {
-            this.pendingInput += key;
-            this.kanaError = true;
-          }
-        }
-        if (!this.alphaError) {
-          this.alphaInput = this.alphaInput.concat(key);
-          this.inputTimer = INPUT_TIMER;
-          var alphaIsValid = this.problems.problems[this.problemId].answers.some(function (ans) {
-            return ans.match("^" + vm.alphaInput);
-          });
-          if (!alphaIsValid) {
-            this.alphaError = true;
-          }
-          var alphaIsCorrect = this.problems.problems[this.problemId].answers.some(function (ans) {
-            return ans === vm.alphaInput;
-          });
-          if (alphaIsCorrect) {
-            this.alphaCorrect = true;
-          }
-        }
-        if (this.kanaCorrect || this.alphaCorrect) {
-          this.inputCorrect();
-        }
-        if (this.kanaError && this.alphaError) {
-          this.inputError();
-        }
-        return;
-      }
-      if ((this.state === STATES.ERROR || this.state === STATES.CORRECT) && key === " ") {
-        if (this.problemId + 1 < this.problems.problems.length) {
-          this.initProblem(this.problemId + 1);
-        } else {
-          playAudio(SOUNDS.COMPLETED);
-          this.state = STATES.RESULT;
-        }
-        return;
-      }
-      if (this.state === STATES.RESULT && key === " ") {
         this.initGame();
-        return;
+      } else if (this.state === STATES.READING && key === " ") {
+        this.stopProblem();
+      } else if (this.state === STATES.INPUT && key.match(/^[a-z0-9-]$/)) {
+        this.processInput(key);
+      } else if ((this.state === STATES.ERROR || this.state === STATES.CORRECT) && key === " ") {
+        this.nextProblem();
+      } else if (this.state === STATES.RESULT && key === " ") {
+        this.backToIntro();
       }
     },
     tick: function () {
       if (this.state === STATES.READING) {
-        if (this.pendingProblem) {
-          this.displayedProblem = this.displayedProblem + this.pendingProblem[0];
-          this.pendingProblem = this.pendingProblem.slice(1);
-          var total = this.problems.problems[this.problemId].body.length;
-          this.scoreDiff = 100 + Math.floor(this.pendingProblem.length / total * 100);
-        } else {
-          this.startInput();
-        }
-        return;
-      }
-      if (this.state === STATES.INPUT) {
-        this.inputTimer -= TICK_INTERVAL;
-        if (this.inputTimer <= 0) {
-          this.inputTimer = 0;
-          this.inputError();
-        }
-        return;
+        this.revealProblem();
+      } else if (this.state === STATES.INPUT) {
+        this.inputCountDown();
       }
     }
   }

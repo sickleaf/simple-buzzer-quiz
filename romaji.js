@@ -1,4 +1,4 @@
-var ROMAJI = {
+const ROMAJI = {
   a:    [ "あ", "" ],
   b:    [ "", "b" ],
   ba:   [ "ば", "" ],
@@ -385,4 +385,17 @@ var ROMAJI = {
   7:    [ "７", "" ],
   8:    [ "８", "" ],
   9:    [ "９", "" ],
+};
+
+const inputRomaji = (confirmedInput, pendingInput, key) => {
+  /* Drop some preceding invalid letters to find a valid entry.
+   * example: mna -> na -> な */
+  let v;
+  for (let i = 0; i <= pendingInput.length && !v; i++) {
+    v = ROMAJI[pendingInput.slice(i).concat(key)];
+  }
+  if (v) {
+    return [confirmedInput.concat(v[0]), v[1]];
+  }
+  return [confirmedInput, pendingInput];
 };
