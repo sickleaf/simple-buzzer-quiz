@@ -40,6 +40,7 @@ var SOUNDS = {
   PROBLEM: loadAudio("./assets/problem.mp3"),
   TIMER: loadAudio("./assets/timer.mp3"),
   WRONG: loadAudio("./assets/wrong.mp3"),
+  COMPLETED: loadAudio("./assets/completed.mp3"),
 };
 
 var vm = new Vue({
@@ -204,6 +205,7 @@ var vm = new Vue({
         if (this.problemId + 1 < this.problems.problems.length) {
           this.initProblem(this.problemId + 1);
         } else {
+          playSound(SOUNDS.COMPLETED);
           this.state = STATES.RESULT;
         }
         return;
