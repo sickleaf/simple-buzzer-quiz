@@ -10,6 +10,21 @@ function shuffleArray (array) {
   }
 }
 
+function loadAudio (path) {
+  const audio = new Audio(path);
+  audio.preload = "auto";
+  return audio;
+}
+
+function playSound (audio) {
+  audio.currentTime = 0;
+  audio.play();
+}
+
+function stopSound (audio) {
+  audio.pause();
+}
+
 var STATES = {
   INTRO: 0,
   READING: 1,
@@ -17,6 +32,14 @@ var STATES = {
   CORRECT: 3,
   ERROR: 4,
   RESULT: 5,
+};
+
+var SOUNDS = {
+  ANSWER: loadAudio("./assets/answer.mp3"),
+  CORRECT: loadAudio("./assets/correct.mp3"),
+  PROBLEM: loadAudio("./assets/problem.mp3"),
+  TIMER: loadAudio("./assets/timer.mp3"),
+  WRONG: loadAudio("./assets/wrong.mp3"),
 };
 
 var vm = new Vue({
@@ -78,6 +101,7 @@ var vm = new Vue({
       this.history = [];
     },
     initProblem: function (problemId) {
+      playSound(SOUNDS.PROBLEM);
       this.state = STATES.READING;
       this.problemId = problemId;
       this.scoreDiff = 200;
@@ -88,6 +112,8 @@ var vm = new Vue({
       this.inputTimer = INPUT_TIMER;
     },
     inputCorrect: function () {
+      stopSound(SOUNDS.TIMER);
+      playSound(SOUNDS.CORRECT);
       this.history = this.history.concat([{
         problem: this.displayedProblem,
         correct: true,
@@ -97,6 +123,10 @@ var vm = new Vue({
       this.state = STATES.CORRECT;
     },
     inputError: function () {
+      stopSound(SOUNDS.TIMER);
+      if (this.inputTimer > 0 || this.pendingProblem !== "") {
+        playSound(SOUNDS.WRONG);
+      }
       this.history = this.history.concat([{
         problem: this.displayedProblem,
         correct: false,
@@ -112,6 +142,8 @@ var vm = new Vue({
         return;
       }
       if (this.state === STATES.READING && key === " ") {
+        playSound(SOUNDS.ANSWER);
+        playSound(SOUNDS.TIMER);
         this.displayedProblem += "/";
         this.state = STATES.INPUT;
         return;
@@ -187,6 +219,7 @@ var vm = new Vue({
           var total = this.problems.problems[this.problemId].body.length;
           this.scoreDiff = 100 + Math.floor(this.pendingProblem.length / total * 100);
         } else {
+          playSound(SOUNDS.TIMER);
           this.state = STATES.INPUT;
         }
         return;
