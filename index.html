@@ -40,13 +40,16 @@
 }
 
 .keyboard {
+  --keyboard-key-w: 10vw;
+  --keyboard-key-h: 12vw;
+  --keyboard-key-margin: 1vw;
   position: absolute;
   bottom: 0;
   left: 0;
   display: flex;
   flex-direction: column;
   width: 100vw;
-  padding: 0.5vw 0;
+  padding: calc(var(--keyboard-key-margin) / 2) 0;
   background: gainsboro;
 }
 
@@ -56,51 +59,78 @@
 }
 
 .keyboard-key-container {
-  width: 9vw;
-  height: 12vw;
-  padding: 0.5vw;
+  width: var(--keyboard-key-w);
+  height: var(--keyboard-key-h);
+  padding: calc(var(--keyboard-key-margin) / 2);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.keyboard-key-container.l {
-  justify-content: flex-end;
+.keyboard-key-container.x05 {
+  width: calc(var(--keyboard-key-w) * 0.5);
 }
 
-.keyboard-key-container.r {
-  justify-content: flex-start;
+.keyboard-key-container.x075 {
+  width: calc(var(--keyboard-key-w) * 0.75);
 }
 
-.keyboard-key-container.x125 {
-  width: calc(9vw * 1.25);
+.keyboard-key-container.x0975 {
+  width: calc(var(--keyboard-key-w) * 0.975);
 }
 
 .keyboard-key-container.x175 {
-  width: calc(9vw * 1.75);
+  width: calc(var(--keyboard-key-w) * 1.75);
 }
 
-.keyboard-key-container.x2 {
-  width: calc(9vw * 2.00);
+.keyboard-key-container.x15 {
+  width: calc(var(--keyboard-key-w) * 1.50);
 }
 
-.keyboard-key-container.x25 {
-  width: calc(9vw * 2.50);
-}
-
-.keyboard-key-container.x35 {
-  width: calc(9vw * 3.50);
+.keyboard-key-container.x225 {
+  width: calc(var(--keyboard-key-w) * 2.25);
 }
 
 .keyboard-key {
   font-size: 4vw;
-  width: 8vw;
-  height: 11vw;
+  width: calc(var(--keyboard-key-w) - var(--keyboard-key-margin));
+  height: calc(var(--keyboard-key-h) - var(--keyboard-key-margin));
   text-align: center;
-  line-height: 11vw;
+  line-height: calc(var(--keyboard-key-h) - var(--keyboard-key-margin));
   background: white;
   border-radius: 2vw;
   box-shadow: 0.2vw 0.2vw grey;
+}
+
+.keyboard-key.spacer {
+  opacity: 0.25;
+  border: 1px solid gray;
+  background: none;
+  box-shadow: none;
+}
+
+.x05 .keyboard-key {
+  width: calc(var(--keyboard-key-w) * 0.5 - var(--keyboard-key-margin));
+}
+
+.x075 .keyboard-key {
+  width: calc(var(--keyboard-key-w) * 0.75 - var(--keyboard-key-margin));
+}
+
+.x0975 .keyboard-key {
+  width: calc(var(--keyboard-key-w) * 0.975 - var(--keyboard-key-margin));
+}
+
+.x15 .keyboard-key {
+  width: calc(var(--keyboard-key-w) * 1.5 - var(--keyboard-key-margin));
+}
+
+.x175 .keyboard-key {
+  width: calc(var(--keyboard-key-w) * 1.75 - var(--keyboard-key-margin));
+}
+
+.x225 .keyboard-key {
+  width: calc(var(--keyboard-key-w) * 2.25 - var(--keyboard-key-margin));
 }
     </style>
   </head>
@@ -253,42 +283,39 @@
 
       <div v-if="IS_TOUCH && state === STATES.INPUT" class="keyboard">
         <div class="keyboard-row">
-          <span @touchend="keyDown('1')" class="keyboard-key-container">
+          <span @touchend="keyDown('1')" class="keyboard-key-container x0975">
             <span class="keyboard-key">1</span>
           </span>
-          <span @touchend="keyDown('2')" class="keyboard-key-container">
+          <span @touchend="keyDown('2')" class="keyboard-key-container x0975">
             <span class="keyboard-key">2</span>
           </span>
-          <span @touchend="keyDown('3')" class="keyboard-key-container">
+          <span @touchend="keyDown('3')" class="keyboard-key-container x0975">
             <span class="keyboard-key">3</span>
           </span>
-          <span @touchend="keyDown('4')" class="keyboard-key-container">
+          <span @touchend="keyDown('4')" class="keyboard-key-container x0975">
             <span class="keyboard-key">4</span>
           </span>
-          <span @touchend="keyDown('5')" class="keyboard-key-container">
+          <span @touchend="keyDown('5')" class="keyboard-key-container x0975">
             <span class="keyboard-key">5</span>
           </span>
-          <span @touchend="keyDown('6')" class="keyboard-key-container">
+          <span @touchend="keyDown('6')" class="keyboard-key-container x0975">
             <span class="keyboard-key">6</span>
           </span>
-          <span @touchend="keyDown('7')" class="keyboard-key-container">
+          <span @touchend="keyDown('7')" class="keyboard-key-container x0975">
             <span class="keyboard-key">7</span>
           </span>
-          <span @touchend="keyDown('8')" class="keyboard-key-container">
+          <span @touchend="keyDown('8')" class="keyboard-key-container x0975">
             <span class="keyboard-key">8</span>
           </span>
-          <span @touchend="keyDown('9')" class="keyboard-key-container">
+          <span @touchend="keyDown('9')" class="keyboard-key-container x0975">
             <span class="keyboard-key">9</span>
           </span>
-          <span @touchend="keyDown('0')" class="keyboard-key-container">
+          <span @touchend="keyDown('0')" class="keyboard-key-container x0975">
             <span class="keyboard-key">0</span>
-          </span>
-          <span @touchend="keyDown('-')" class="keyboard-key-container">
-            <span class="keyboard-key">-</span>
           </span>
         </div>
         <div class="keyboard-row">
-          <span @touchend="keyDown('q')" class="keyboard-key-container x175 l">
+          <span @touchend="keyDown('q')" class="keyboard-key-container x075">
             <span class="keyboard-key">Q</span>
           </span>
           <span @touchend="keyDown('w')" class="keyboard-key-container">
@@ -315,12 +342,12 @@
           <span @touchend="keyDown('o')" class="keyboard-key-container">
             <span class="keyboard-key">O</span>
           </span>
-          <span @touchend="keyDown('p')" class="keyboard-key-container x125 r">
+          <span @touchend="keyDown('p')" class="keyboard-key-container">
             <span class="keyboard-key">P</span>
           </span>
         </div>
         <div class="keyboard-row">
-          <span @touchend="keyDown('a')" class="keyboard-key-container x2 l">
+          <span @touchend="keyDown('a')" class="keyboard-key-container">
             <span class="keyboard-key">A</span>
           </span>
           <span @touchend="keyDown('s')" class="keyboard-key-container">
@@ -344,12 +371,18 @@
           <span @touchend="keyDown('k')" class="keyboard-key-container">
             <span class="keyboard-key">K</span>
           </span>
-          <span @touchend="keyDown('l')" class="keyboard-key-container x2 r">
+          <span @touchend="keyDown('l')" class="keyboard-key-container">
             <span class="keyboard-key">L</span>
+          </span>
+          <span @touchend="keyDown('l')" class="keyboard-key-container x075">
+            <span class="keyboard-key spacer"></span>
           </span>
         </div>
         <div class="keyboard-row">
-          <span @touchend="keyDown('z')" class="keyboard-key-container x25 l">
+          <span @touchend="keyDown('z')" class="keyboard-key-container x05">
+            <span class="keyboard-key spacer"></span>
+          </span>
+          <span @touchend="keyDown('z')" class="keyboard-key-container">
             <span class="keyboard-key">Z</span>
           </span>
           <span @touchend="keyDown('x')" class="keyboard-key-container">
@@ -367,8 +400,11 @@
           <span @touchend="keyDown('n')" class="keyboard-key-container">
             <span class="keyboard-key">N</span>
           </span>
-          <span @touchend="keyDown('m')" class="keyboard-key-container x35 r">
+          <span @touchend="keyDown('m')" class="keyboard-key-container">
             <span class="keyboard-key">M</span>
+          </span>
+          <span @touchend="keyDown('-')" class="keyboard-key-container x225">
+            <span class="keyboard-key">-</span>
           </span>
         </div>
       </div>

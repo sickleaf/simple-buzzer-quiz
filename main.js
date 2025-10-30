@@ -211,6 +211,6 @@ const vm = new Vue({
       } else if (this.state === STATES.INPUT) {
         this.inputCountDown();
       }
-    }
+    },
   }
 });
