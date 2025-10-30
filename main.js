@@ -1,5 +1,6 @@
 const TICK_INTERVAL = 125;  /* msec */
 const INPUT_TIMER   = 5999; /* msec */
+const BS_PENALTY    = 1000; /* msec */
 const IS_TOUCH = "ontouchstart" in window;
 
 function shuffleArray (array) {
@@ -48,11 +49,10 @@ const data = {
   kanaInput: null,
   alphaInput: null,
   pendingKana: null,
-  alphaError: null,
   alphaCorrect: null,
-  kanaError: null,
   kanaCorrect: null,
   inputTimer: null,
+  bsCount: 0,
 };
 
 const vm = new Vue({
@@ -136,37 +136,40 @@ const vm = new Vue({
       playAudio(SOUNDS.TIMER);
       this.inputTimer = INPUT_TIMER;
       this.kanaInput = this.alphaInput = this.pendingKana = "";
-      this.alphaError = this.kanaError = this.alphaCorrect = this.kanaCorrect = false;
+      this.alphaCorrect = this.kanaCorrect = false;
+      this.bsCount = 0;
       this.state = STATES.INPUT;
     },
     processInput: function (key) {
       stopAudio(SOUNDS.TIMER);
       playAudio(SOUNDS.KEY);
-      this.inputTimer = INPUT_TIMER;
-      if (!this.kanaError) {
-        [this.kanaInput, this.pendingKana] = inputRomaji(this.kanaInput, this.pendingKana, key);
-        this.kanaError = this.problems.problems[this.problemId].answers.every(
-          (ans) => !ans.startsWith(vm.kanaInput)
-        );
-        this.kanaCorrect = !this.kanaError && this.problems.problems[this.problemId].answers.some(
-          (ans) => ans === vm.kanaInput
-        );
+      if (this.bsCount === 0) {
+        this.inputTimer = INPUT_TIMER;
+      } else {
+        this.bsCount -= 1;
       }
-      if (!this.alphaError) {
-        this.alphaInput = this.alphaInput.concat(key);
-        this.alphaError = this.problems.problems[this.problemId].answers.every(
-          (ans) => !ans.startsWith(vm.alphaInput)
-        );
-        this.alphaCorrect = !this.alphaError && this.problems.problems[this.problemId].answers.some(
-          (ans) => ans === vm.alphaInput
-        );
-      }
+      [this.kanaInput, this.pendingKana] = inputRomaji(this.kanaInput, this.pendingKana, key);
+      this.alphaInput = this.alphaInput.concat(key);
+      this.kanaCorrect = this.problems.problems[this.problemId].answers.some(
+        (ans) => ans === vm.kanaInput
+      );
+      this.alphaCorrect = this.problems.problems[this.problemId].answers.some(
+        (ans) => ans === vm.alphaInput
+      );
       if (this.kanaCorrect || this.alphaCorrect) {
         this.inputCorrect();
       }
-      if (this.kanaError && this.alphaError) {
-        this.inputError();
+    },
+    processBackspace: function () {
+      if (this.alphaInput === "") {
+        return;
       }
+      playAudio(SOUNDS.KEY);
+      stopAudio(SOUNDS.TIMER);
+      this.bsCount += 1;
+      this.alphaInput = this.alphaInput.slice(0, -1);
+      [this.kanaInput, this.pendingKana] = batchInputRomaji(this.alphaInput);
+      this.inputTimer = Math.max(0, this.inputTimer - BS_PENALTY);
     },
     inputCountDown: function () {
       this.inputTimer -= TICK_INTERVAL;
@@ -211,8 +214,12 @@ const vm = new Vue({
         this.initGame();
       } else if (this.state === STATES.READING && key === " ") {
         this.stopProblem();
-      } else if (this.state === STATES.INPUT && key.match(/^[a-z0-9-]$/)) {
-        this.processInput(key);
+      } else if (this.state === STATES.INPUT) {
+        if (key.match(/^[a-z0-9-]$/)) {
+          this.processInput(key);
+        } else if (key === "Backspace") {
+          this.processBackspace();
+        }
       } else if ((this.state === STATES.ERROR || this.state === STATES.CORRECT) && key === " ") {
         this.nextProblem();
       } else if (this.state === STATES.RESULT && key === " ") {

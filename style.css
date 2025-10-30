@@ -69,16 +69,16 @@
   width: calc(var(--keyboard-key-w) * 0.975);
 }
 
-.keyboard-key-container.x175 {
-  width: calc(var(--keyboard-key-w) * 1.75);
+.keyboard-key-container.x125 {
+  width: calc(var(--keyboard-key-w) * 1.25);
 }
 
 .keyboard-key-container.x15 {
   width: calc(var(--keyboard-key-w) * 1.50);
 }
 
-.keyboard-key-container.x225 {
-  width: calc(var(--keyboard-key-w) * 2.25);
+.keyboard-key-container.x175 {
+  width: calc(var(--keyboard-key-w) * 1.75);
 }
 
 .keyboard-key {
@@ -111,14 +111,14 @@
   width: calc(var(--keyboard-key-w) * 0.975 - var(--keyboard-key-margin));
 }
 
+.x125 .keyboard-key {
+  width: calc(var(--keyboard-key-w) * 1.25 - var(--keyboard-key-margin));
+}
+
 .x15 .keyboard-key {
   width: calc(var(--keyboard-key-w) * 1.5 - var(--keyboard-key-margin));
 }
 
 .x175 .keyboard-key {
   width: calc(var(--keyboard-key-w) * 1.75 - var(--keyboard-key-margin));
-}
-
-.x225 .keyboard-key {
-  width: calc(var(--keyboard-key-w) * 2.25 - var(--keyboard-key-margin));
 }
