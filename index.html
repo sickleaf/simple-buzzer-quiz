@@ -16,23 +16,22 @@
   <body>
     <div id="app">
 
-      <header>
-        <h1>
-          早押し検定 〜 <span v-if="problems">{{ problems.title }}</span>
-        </h1>
-        <p v-if="problems">
-          作問:
-          <a target="_blank" :href="problems.author.url">{{ problems.author.text }}</a>
-          /
-          プログラム:
-          <a target="_blank" href="https://zk-phi.github.io/">zk-phi</a>
-          /
-          効果音:
-          <a target="_blank" href="https://soundeffect-lab.info">効果音ラボ</a>
-        </p>
-      </header>
-
       <div v-if="state === STATES.INTRO">
+        <header>
+          <h1>
+            早押し検定 〜 <span v-if="problems">{{ problems.title }}</span>
+          </h1>
+          <p v-if="problems">
+            作問:
+            <a target="_blank" :href="problems.author.url">{{ problems.author.text }}</a>
+            /
+            プログラム:
+            <a target="_blank" href="https://zk-phi.github.io/">zk-phi</a>
+            /
+            効果音:
+            <a target="_blank" href="https://soundeffect-lab.info">効果音ラボ</a>
+          </p>
+        </header>
         <p v-if="problems && problems.description">
           {{ problems.description }}
         </p>
