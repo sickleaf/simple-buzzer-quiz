@@ -17,32 +17,25 @@
     <div id="app">
 
       <div v-if="state === STATES.INTRO">
-        <header>
-          <h1>
-            早押し検定 〜 <span v-if="problems">{{ problems.title }}</span>
-          </h1>
-          <p v-if="problems">
-            作問:
-            <a target="_blank" :href="problems.author.url">{{ problems.author.text }}</a>
-            /
-            プログラム:
-            <a target="_blank" href="https://zk-phi.github.io/">zk-phi</a>
-            /
-            効果音:
-            <a target="_blank" href="https://soundeffect-lab.info">効果音ラボ</a>
-          </p>
-        </header>
+        <h1>
+          早押し検定
+          <small v-if="problems">〜 {{ problems.title }}</small>
+        </h1>
+        <p v-if="problems">
+          作問:
+          <a target="_blank" :href="problems.author.url">{{ problems.author.text }}</a>
+        </p>
         <p v-if="problems && problems.description">
           {{ problems.description }}
         </p>
-        <h3>遊びかた</h3>
+        <h4>遊びかた</h4>
         <ul>
           <li>わかりそうなところで [Space] キーを押すと問題文が止まります。</li>
           <li>早く止めて正解するほど高得点（100 〜 200点）がもらえます。</li>
           <li>シンキングタイムは約５秒です。問題を止めてから約５秒放置すると不正解になります。</li>
           <li>不正解の問題は０点になります。お手つきはありません。</li>
         </ul>
-        <h3>操作方法</h3>
+        <h4>操作方法</h4>
         <ul>
           <li>タイピングゲームのように、キーボードで答えを入力してください。</li>
           <li>漢字変換や、「半角・全角」の切り替えは不要です。</li>
@@ -53,11 +46,11 @@
             をどうぞ。
           </li>
         </ul>
-        <h3>Tips</h3>
+        <h4>Tips</h4>
         <ul>
           <li>タイピング速度はスコアに関係ありません。</li>
           <li>タイプミスは不正解になるので、慎重に入力してください。</li>
-          <li>オリジナル問題で遊びたい方は<a target="_blank" href="./json.html">こちら</a>。</li>
+          <li><a target="_blank" href="./json.html">あなたもオリジナルのクイズを公開してみませんか？</a></li>
         </ul>
         <hr />
         <p v-if="loadError">問題の読み込みに失敗しました</p>
@@ -66,10 +59,17 @@
           <button v-if="IS_TOUCH" @click="keyDown(' ')">スタート（音が鳴ります）</button>
           <span v-else>[Space] でスタート（音が鳴ります）</span>
         </p>
+        <footer>
+          プログラム:
+          <a target="_blank" href="https://zk-phi.github.io/">zk-phi</a>
+          /
+          効果音:
+          <a target="_blank" href="https://soundeffect-lab.info">効果音ラボ</a>
+        </footer>
       </div>
 
       <div v-if="state === STATES.READING">
-        <h2>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h2>
+        <h4>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h4>
         <p>現在スコア {{ score }} <span v-if="scoreDiff">(+ {{ scoreDiff }})</span></p>
         <blockquote>
           {{ displayedProblem }}<span class="hidden">{{ pendingProblem }}</span>
@@ -84,7 +84,7 @@
       </div>
 
       <div v-if="state === STATES.INPUT">
-        <h2>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h2>
+        <h4>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h4>
         <p>現在スコア {{ score }} <span v-if="scoreDiff">(+ {{ scoreDiff }})</span></p>
         <blockquote>
           {{ displayedProblem }}<span class="hidden">{{ pendingProblem }}</span>
@@ -101,7 +101,7 @@
       </div>
 
       <div v-if="state === STATES.CORRECT">
-        <h2>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h2>
+        <h4>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h4>
         <p>現在スコア {{ score }} <span v-if="scoreDiff" class="correct">(+{{ scoreDiff }})</span></p>
         <blockquote>{{ displayedProblem }}{{ pendingProblem }}</blockquote>
         <p class="diminished">シンキングタイム: {{ Math.floor(inputTimer / 1000) }}</p>
@@ -123,7 +123,7 @@
       </div>
 
       <div v-if="state === STATES.ERROR">
-        <h2>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h2>
+        <h4>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h4>
         <p>現在スコア {{ score }} <span v-if="scoreDiff" class="diminished">(+ {{ scoreDiff }})</span></p>
         <blockquote>{{ displayedProblem }}{{ pendingProblem }}</blockquote>
         <p class="diminished">シンキングタイム: {{ Math.floor(inputTimer / 1000) }}</p>
@@ -143,13 +143,13 @@
       </div>
 
       <div v-if="state === STATES.RESULT">
-        <h2>検定終了</h2>
+        <h4>検定終了</h4>
         <p>おつかれさまでした！</p>
         <p>
           スコア: {{ score }} 点 (正答数 {{ correctCount }}/{{ problems.problems.length }})
           <a target="_blank" :href="shareUrl">Tweet</a>
         </p>
-        <h3>問題一覧</h3>
+        <h4>問題一覧</h4>
         <table>
           <tbody>
             <tr v-for="row in history">
