@@ -30,32 +30,34 @@ const SOUNDS = {
   KEY: loadAudio("./assets/key.mp3"),
 };
 
+const data = {
+  problems: null,
+  loadError: false,
+  loadingStatus: "問題データを読み込み中 ...",
+  /* game */
+  state: STATES.INTRO,
+  score: 0,
+  correctCount: 0,
+  history: [],
+  /* problem */
+  problemId: null,
+  scoreDiff: 200,
+  displayedProblem: null,
+  pendingProblem: null,
+  /* input */
+  kanaInput: null,
+  alphaInput: null,
+  pendingKana: null,
+  alphaError: null,
+  alphaCorrect: null,
+  kanaError: null,
+  kanaCorrect: null,
+  inputTimer: null,
+};
+
 const vm = new Vue({
   el: "#app",
-  data: {
-    problems: null,
-    loadError: false,
-    loadingStatus: "問題データを読み込み中 ...",
-    /* game */
-    state: STATES.INTRO,
-    score: 0,
-    correctCount: 0,
-    history: [],
-    /* problem */
-    problemId: null,
-    scoreDiff: 200,
-    displayedProblem: null,
-    pendingProblem: null,
-    /* input */
-    kanaInput: null,
-    alphaInput: null,
-    pendingKana: null,
-    alphaError: null,
-    alphaCorrect: null,
-    kanaError: null,
-    kanaCorrect: null,
-    inputTimer: null,
-  },
+  data,
   mounted: function () {
     setInterval(this.tick, TICK_INTERVAL);
     window.addEventListener("keydown", (e) => vm.keyDown(e.key));
