@@ -61,7 +61,10 @@
           <li>オリジナル問題で遊びたい方は<a target="_blank" href="./json.html">こちら</a>。</li>
         </ul>
         <hr />
-        <p v-if="problems">[Space] でスタート（音が鳴ります）</p>
+        <p v-if="problems">
+          <button v-if="IS_TOUCH" @click="keyDown(' ')">スタート（音が鳴ります）</button>
+          <span v-else>[Space] でスタート（音が鳴ります）</span>
+        </p>
         <p v-else-if="loadError">問題の読み込みに失敗しました</p>
         <p v-else>問題を読み込み中です ...</p>
       </div>
@@ -73,7 +76,12 @@
           {{ displayedProblem }}<span class="hidden">{{ pendingProblem }}</span>
         </blockquote>
         <hr />
-        <p>[Space] で回答開始</p>
+        <p v-if="IS_TOUCH">画面をタップで回答開始</p>
+        <p v-else>[Space] で回答開始</p>
+      </div>
+
+      <div v-if="IS_TOUCH && state === STATES.READING"
+          @touchend="keyDown(' ')" class="touch-overlay">
       </div>
 
       <div v-if="state === STATES.INPUT">
@@ -109,7 +117,10 @@
         <p>A. {{ problems.problems[problemId].displayAnswer }}</p>
         <p><small>{{ problems.problems[problemId].explanation }}</small></p>
         <hr />
-        <p>[Space] で次へ</p>
+        <p>
+          <button v-if="IS_TOUCH" @click="keyDown(' ')">次へ</button>
+          <span v-else>[Space] で次へ</span>
+        </p>
       </div>
 
       <div v-if="state === STATES.ERROR">
@@ -126,7 +137,10 @@
         <p>A. {{ problems.problems[problemId].displayAnswer }}</p>
         <small>{{ problems.problems[problemId].explanation }}</small>
         <hr />
-        <p>[Space] で次へ</p>
+        <p>
+          <button v-if="IS_TOUCH" @click="keyDown(' ')">次へ</button>
+          <span v-else>[Space] で次へ</span>
+        </p>
       </div>
 
       <div v-if="state === STATES.RESULT">
@@ -151,11 +165,10 @@
           </tbody>
         </table>
         <hr />
-        <p>[Space] で最初に戻る</p>
-      </div>
-
-      <div v-if="IS_TOUCH && state !== STATES.INPUT"
-          @touchend="keyDown(' ')" class="touch-overlay">
+        <p>
+          <button v-if="IS_TOUCH" @click="keyDown(' ')">最初に戻る</button>
+          <span v-else>[Space] で最初に戻る</span>
+        </p>
       </div>
 
       <div v-if="IS_TOUCH && state === STATES.INPUT" class="keyboard">
