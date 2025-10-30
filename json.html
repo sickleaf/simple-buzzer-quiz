@@ -13,10 +13,86 @@
       <h1>早押し検定 〜 問題データの作り方</h1>
     </header>
 
-    <h3>データの形式</h3>
+    <h2>Google Spreadsheet を使った作り方（初心者向け）</h2>
+
+    <h4>1. シートのコピー</h4>
 
     <p>
-      以下の形式の JSON ファイルを開くことができます。
+      <img src="./assets/copy.png" />
+    </p>
+    <p>
+      <a target="_blank" href="https://docs.google.com/spreadsheets/d/1uXs4NoKiJQX2nh6PAQUgL4x3Po4jKjWrosQMNS52uiU/edit?usp=sharing">このシート</a> を開いて、「ファイル」メニューからコピーを作成してください。
+    </p>
+
+    <h4>2. Google App Script をデプロイ</h4>
+
+    <p>
+      <img src="./assets/gas.png" />
+    </p>
+    <p>
+      「拡張機能」メニューから「Apps Script」を開いてください。
+    </p>
+
+    <p>
+      <img src="./assets/deploymenu.png" />
+    </p>
+    <p>
+      画面右上の「デプロイ」ボタンから、「新しいデプロイ」を選択してください。
+    </p>
+
+    <p>
+      <img src="./assets/deploy.png" />
+    </p>
+    <p>
+      「種類の選択」で「ウェブアプリ」を選び、「次のユーザーとして実行」を「自分」、「アクセスできるユーザー」を「全員」としてデプロイしてください。
+    </p>
+
+    <p>
+      <img src="./assets/accesscontrol.png" />
+    </p>
+    <p>
+      初回は権限の承認が必要になる場合があります。画面左下の「詳細」から承認できます。
+    </p>
+
+    <p>
+      <img src="./assets/url.png" />
+    </p>
+    <p>
+      デプロイに成功すると URL が発行されます。これを忘れずにコピーしておいてください。
+    </p>
+
+    <h4>3. URL を作成</h4>
+
+    <p>
+      コピーした URL の先頭にある「https://」を、次の文字列に書き替えてください「https://zk-phi.github.io/simple-buzzer-quiz/?」。
+    </p>
+    <p>
+      例：<a target="_blank" href="https://zk-phi.github.io/simple-buzzer-quiz/?script.google.com/macros/s/AKfycbzd2ScwArdyhS59HG_aAo4YTKNdonvX8Gkljzef0FKPlCt8p8p93FtAMWnd4jR1UtzYGQ/exec">https://zk-phi.github.io/simple-buzzer-quiz/?script.google.com/macros/s/AKfycbzd2ScwArdyhS59HG_aAo4YTKNdonvX8Gkljzef0FKPlCt8p8p93FtAMWnd4jR1UtzYGQ/exec</a>
+    </p>
+    <p>
+      この URL が、あなたのオリジナル問題で遊ぶための URL になります。ためしにアクセスしてみて、サンプル問題が読み込まれることを確認してください。
+    </p>
+    <p>
+      よくわからない App Script の画面は、もう使わないので閉じてしまって大丈夫です。
+    </p>
+
+    <h4>4. 問題の編集</h4>
+
+    <p>
+      あとはあなたの問題をスプレッドシートに記入するだけです！スプレッドシートを保存すれば、すぐにゲームに反映されます。
+    </p>
+    <p>
+      作成した問題は、SNS やホームページなどで自由に共有していただいて構いません。
+    </p>
+
+    <hr />
+
+    <h2>JSON データを自分で作成する（上級者向け）</h2>
+
+    <h4>データの形式</h4>
+
+    <p>
+      このアプリでは、以下の形式の JSON ファイルを開くことができます。
       <a target="_blank" href="https://github.com/zk-phi/simple-buzzer-quiz/blob/gh-pages/problems.json">サンプル</a>
     </p>
 
@@ -47,10 +123,10 @@
       かなとアルファベットが混在するような解答は、現時点では設定できません🙇
     </p>
 
-    <h3>データの読み込みかた</h3>
+    <h4>データの読み込みかた</h4>
 
     <p>
-      "https://zk-phi.github.io/simple-buzzer-quiz/?" の後ろに、 JSON ファイルの URL を書いて下さい（"https://" は不要）。
+      「https://zk-phi.github.io/simple-buzzer-quiz/?」の後ろに、 JSON ファイルの URL を書いて下さい（「https://」 は不要）。
     </p>
     <p>
       例：<a target="_blank" href="https://zk-phi.github.io/simple-buzzer-quiz/?raw.githubusercontent.com/zk-phi/simple-buzzer-quiz/refs/heads/gh-pages/problems.json">https://zk-phi.github.io/simple-buzzer-quiz/?raw.githubusercontent.com/zk-phi/simple-buzzer-quiz/refs/heads/gh-pages/problems.json</a>
