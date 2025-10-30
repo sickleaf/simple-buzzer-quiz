@@ -24,6 +24,14 @@
         <p v-if="problems">
           作問:
           <a target="_blank" :href="problems.author.url">{{ problems.author.text }}</a>
+          <small>
+            /
+            プログラム:
+            <a target="_blank" href="https://zk-phi.github.io/">zk-phi</a>
+            /
+            効果音:
+            <a target="_blank" href="https://soundeffect-lab.info">効果音ラボ</a>
+          </small>
         </p>
         <p v-if="problems && problems.description">
           {{ problems.description }}
@@ -60,13 +68,6 @@
           <button v-if="IS_TOUCH" @click="keyDown(' ')">スタート（音が鳴ります）</button>
           <span v-else>[Space] でスタート（音が鳴ります）</span>
         </p>
-        <footer>
-          プログラム:
-          <a target="_blank" href="https://zk-phi.github.io/">zk-phi</a>
-          /
-          効果音:
-          <a target="_blank" href="https://soundeffect-lab.info">効果音ラボ</a>
-        </footer>
       </div>
 
       <div v-if="state === STATES.READING">
