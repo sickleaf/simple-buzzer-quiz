@@ -69,8 +69,8 @@
       </div>
 
       <div v-if="state === STATES.READING">
-        <h4>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h4>
-        <p>現在スコア {{ score }} <span v-if="scoreDiff">(+ {{ scoreDiff }})</span></p>
+        <h4>問 {{ problemId + 1 }} <small>/ {{ problems.problems.length }}</small></h4>
+        <p>スコア: {{ score }} <span v-if="scoreDiff">(+ {{ scoreDiff }})</span></p>
         <blockquote>
           {{ displayedProblem }}<span class="hidden">{{ pendingProblem }}</span>
         </blockquote>
@@ -84,8 +84,8 @@
       </div>
 
       <div v-if="state === STATES.INPUT">
-        <h4>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h4>
-        <p>現在スコア {{ score }} <span v-if="scoreDiff">(+ {{ scoreDiff }})</span></p>
+        <h4>問 {{ problemId + 1 }} <small>/ {{ problems.problems.length }}</small></h4>
+        <p>スコア: {{ score }} <span v-if="scoreDiff">(+ {{ scoreDiff }})</span></p>
         <blockquote>
           {{ displayedProblem }}<span class="hidden">{{ pendingProblem }}</span>
         </blockquote>
@@ -101,8 +101,8 @@
       </div>
 
       <div v-if="state === STATES.CORRECT">
-        <h4>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h4>
-        <p>現在スコア {{ score }} <span v-if="scoreDiff" class="correct">(+{{ scoreDiff }})</span></p>
+        <h4>問 {{ problemId + 1 }} <small>/ {{ problems.problems.length }}</small></h4>
+        <p>スコア: {{ score }} <span v-if="scoreDiff" class="correct">(+{{ scoreDiff }})</span></p>
         <blockquote>{{ displayedProblem }}{{ pendingProblem }}</blockquote>
         <p class="diminished">シンキングタイム: {{ Math.floor(inputTimer / 1000) }}</p>
         <p :class="{ diminished: !alphaCorrect, correct: alphaCorrect }">
@@ -123,8 +123,8 @@
       </div>
 
       <div v-if="state === STATES.ERROR">
-        <h4>問題 ({{ problemId + 1 }}/{{ problems.problems.length }})</h4>
-        <p>現在スコア {{ score }} <span v-if="scoreDiff" class="diminished">(+ {{ scoreDiff }})</span></p>
+        <h4>問 {{ problemId + 1 }} <small>/ {{ problems.problems.length }}</small></h4>
+        <p>スコア: {{ score }} <span v-if="scoreDiff" class="diminished">(+ {{ scoreDiff }})</span></p>
         <blockquote>{{ displayedProblem }}{{ pendingProblem }}</blockquote>
         <p class="diminished">シンキングタイム: {{ Math.floor(inputTimer / 1000) }}</p>
         <p class="diminished">
