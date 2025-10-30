@@ -35,6 +35,7 @@ const vm = new Vue({
   data: {
     problems: null,
     loadError: false,
+    loadingStatus: "問題データを読み込み中 ...",
     /* game */
     state: STATES.INTRO,
     score: 0,
@@ -86,6 +87,17 @@ const vm = new Vue({
       xhr.onerror = function () { vm.loadError = true; };
       xhr.open("GET", match ? `https://${match[1]}` : "problems.json", true);
       xhr.send(null);
+    },
+    monitorLoadingStatus: function () {
+      if (this.problems) {
+        const audios = Object.values(SOUNDS);
+        const loadingAudios = audios.filter((audio) => audio.loading).length;
+        if (loadingAudios > 0) {
+          this.loadingStatus = `効果音を読み込み中 (残り ${loadingAudios}) ...`;
+        } else {
+          this.loadingStatus = null;
+        }
+      }
     },
     initGame: function () {
       if (this.problems.shuffle) {
@@ -193,7 +205,7 @@ const vm = new Vue({
       this.state = STATES.INTRO;
     },
     keyDown: function (key) {
-      if (this.state === STATES.INTRO && this.problems && key === " ") {
+      if (this.state === STATES.INTRO && !this.loadingStatus && key === " ") {
         this.initGame();
       } else if (this.state === STATES.READING && key === " ") {
         this.stopProblem();
@@ -206,7 +218,9 @@ const vm = new Vue({
       }
     },
     tick: function () {
-      if (this.state === STATES.READING) {
+      if (this.loadingStatus) {
+        this.monitorLoadingStatus();
+      } else if (this.state === STATES.READING) {
         this.revealProblem();
       } else if (this.state === STATES.INPUT) {
         this.inputCountDown();
