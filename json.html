@@ -16,7 +16,7 @@
     <h2>Google Spreadsheet を使った作り方（初心者向け）</h2>
 
     <p>
-      一度設定してしまえばスプレッドシートで問題を管理できて便利ですが、ロードはやや重くなります。
+      一度設定してしまえばスプレッドシートで問題を管理できて便利ですが、問題のロードはやや重くなります。
     </p>
 
     <h4>1. シートのコピー</h4>
@@ -28,34 +28,20 @@
       <a target="_blank" href="https://docs.google.com/spreadsheets/d/1uXs4NoKiJQX2nh6PAQUgL4x3Po4jKjWrosQMNS52uiU/edit?usp=sharing">このシート</a> を開いて、「ファイル」メニューからコピーを作成してください。
     </p>
 
-    <h4>2. Apps Script をデプロイ</h4>
+    <h4>2. シートをウェブに公開</h4>
 
     <p>
-      <img src="./assets/gas.png" />
+      <img src="./assets/publish.png" />
     </p>
     <p>
-      「拡張機能」メニューから「Apps Script」を開いてください。
-    </p>
-
-    <p>
-      <img src="./assets/deploymenu.png" />
-    </p>
-    <p>
-      画面右上の「デプロイ」ボタンから、「新しいデプロイ」を選択してください。
+      「ファイル」メニューから「共有＞ウェブに公開」を選択します。
     </p>
 
     <p>
-      <img src="./assets/deploy.png" />
+      <img src="./assets/publishmenu.png" />
     </p>
     <p>
-      「種類の選択」で「ウェブアプリ」を選び、「次のユーザーとして実行」を「自分」、「アクセスできるユーザー」を「全員」としてデプロイしてください。
-    </p>
-
-    <p>
-      <img src="./assets/accesscontrol.png" />
-    </p>
-    <p>
-      初回は権限の承認が必要になる場合があります。画面左下の「詳細」から承認できます。
+      「タブ区切り形式（.tsv）」のリンクを作成します。
     </p>
 
     <p>
@@ -65,25 +51,19 @@
       成功すると URL が発行されます。これを忘れずにコピーしておいてください。
     </p>
 
-    <h4>3. URL を作成</h4>
+    <h4>3. ゲームの URL を作成</h4>
 
     <p>
-      コピーした URL の先頭にある「https://」を、次の文字列に書き替えてください「https://zk-phi.github.io/simple-buzzer-quiz/?」。
-    </p>
-    <p>
-      例：<a target="_blank" href="https://zk-phi.github.io/simple-buzzer-quiz/?script.google.com/macros/s/AKfycbzd2ScwArdyhS59HG_aAo4YTKNdonvX8Gkljzef0FKPlCt8p8p93FtAMWnd4jR1UtzYGQ/exec">https://zk-phi.github.io/simple-buzzer-quiz/?script.google.com/macros/s/AKfycbzd2ScwArdyhS59HG_aAo4YTKNdonvX8Gkljzef0FKPlCt8p8p93FtAMWnd4jR1UtzYGQ/exec</a>
+      コピーした URL を、シートの「TSV の URL」欄に貼り付けてください。「ゲームの URL」が自動的に作成されます。
     </p>
     <p>
       この URL が、あなたのオリジナル問題で遊ぶための URL になります。ためしにアクセスしてみて、サンプル問題が読み込まれることを確認してください。
-    </p>
-    <p>
-      Apps Script の画面は、もう使わないので閉じてしまって大丈夫です。
     </p>
 
     <h4>4. 問題の編集</h4>
 
     <p>
-      あとはあなたの問題をスプレッドシートに記入するだけです！スプレッドシートを保存すれば、すぐにゲームに反映されます。
+      あとはあなたの問題をスプレッドシートに記入するだけです！スプレッドシートを保存すれば、まもなくゲームに反映されます。
     </p>
     <p>
       作成した問題は、SNS やホームページなどで自由に共有していただいて構いません。
