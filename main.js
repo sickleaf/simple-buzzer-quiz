@@ -85,7 +85,13 @@ const vm = new Vue({
     loadProblems: function () {
       const match = location.href.match(/\?(.+)$/);
       const xhr = new XMLHttpRequest();
-      xhr.onload = function () { vm.problems = JSON.parse(xhr.responseText); };
+      xhr.onload = function () {
+        if (xhr.responseText.startsWith("作問テンプレートv1.0")) {
+          vm.problems = importTsv1(xhr.responseText);
+        } else {
+          vm.problems = JSON.parse(xhr.responseText);
+        }
+      };
       xhr.onerror = function () { vm.loadError = true; };
       xhr.open("GET", match ? `https://${match[1]}` : "problems.json", true);
       xhr.send(null);
