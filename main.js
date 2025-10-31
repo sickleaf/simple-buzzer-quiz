@@ -1,6 +1,5 @@
 const TICK_INTERVAL = 125;  /* msec */
 const INPUT_TIMER   = 5999; /* msec */
-const BS_PENALTY    = 1000; /* msec */
 const IS_TOUCH = "ontouchstart" in window;
 
 function shuffleArray (array) {
@@ -52,7 +51,7 @@ const data = {
   alphaCorrect: null,
   kanaCorrect: null,
   inputTimer: null,
-  bsCount: 0,
+  inputTimerHistory: [],
 };
 
 const vm = new Vue({
@@ -141,19 +140,16 @@ const vm = new Vue({
     startInput: function () {
       playAudio(SOUNDS.TIMER);
       this.inputTimer = INPUT_TIMER;
+      this.inputTimerHistory = [];
       this.kanaInput = this.alphaInput = this.pendingKana = "";
       this.alphaCorrect = this.kanaCorrect = false;
-      this.bsCount = 0;
       this.state = STATES.INPUT;
     },
     processInput: function (key) {
       stopAudio(SOUNDS.TIMER);
       playAudio(SOUNDS.KEY);
-      if (this.bsCount === 0) {
-        this.inputTimer = INPUT_TIMER;
-      } else {
-        this.bsCount -= 1;
-      }
+      this.inputTimerHistory = this.inputTimerHistory.concat(this.inputTimer);
+      this.inputTimer = INPUT_TIMER;
       [this.kanaInput, this.pendingKana] = inputRomaji(this.kanaInput, this.pendingKana, key);
       this.alphaInput = this.alphaInput.concat(key);
       this.kanaCorrect = this.problems.problems[this.problemId].answers.some(
@@ -172,10 +168,13 @@ const vm = new Vue({
       }
       playAudio(SOUNDS.KEY);
       stopAudio(SOUNDS.TIMER);
-      this.bsCount += 1;
       this.alphaInput = this.alphaInput.slice(0, -1);
       [this.kanaInput, this.pendingKana] = batchInputRomaji(this.alphaInput);
-      this.inputTimer = Math.max(0, this.inputTimer - BS_PENALTY);
+      const timeSpent = INPUT_TIMER - this.inputTimer;
+      this.inputTimer = (
+        Math.max(0, this.inputTimerHistory[this.inputTimerHistory.length - 1] - timeSpent)
+      );
+      this.inputTimerHistory = this.inputTimerHistory.slice(0, -1);
     },
     inputCountDown: function () {
       this.inputTimer -= TICK_INTERVAL;
