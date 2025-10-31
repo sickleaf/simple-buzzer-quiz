@@ -44,6 +44,7 @@ const data = {
   scoreDiff: 200,
   displayedProblem: null,
   pendingProblem: null,
+  progressBG: null,
   /* input */
   kanaInput: null,
   alphaInput: null,
@@ -117,24 +118,31 @@ const vm = new Vue({
     },
     initProblem: function (problemId) {
       playAudio(SOUNDS.PROBLEM);
-      this.state = STATES.READING;
       this.problemId = problemId;
       this.scoreDiff = 200;
+      this.progressBG = "linear-gradient(to right,#edad0b 0%,#edad0b 50%,#DA5019 50%)";
       this.displayedProblem = "";
       this.pendingProblem = "問題:  " + this.problems.problems[problemId].body.normalize();
+      this.state = STATES.READING;
     },
     revealProblem: function () {
       if (this.pendingProblem) {
         this.displayedProblem = this.displayedProblem + this.pendingProblem[0];
         this.pendingProblem = this.pendingProblem.slice(1);
         const total = this.problems.problems[this.problemId].body.length;
-        this.scoreDiff = 100 + Math.floor(this.pendingProblem.length / total * 100);
+        this.scoreDiff = 100 + Math.round(this.pendingProblem.length / total * 100);
+        const p = this.scoreDiff / 2;
+        this.progressBG = (
+          `linear-gradient(to right,#edad0b 0%,#edad0b 50%,#DA5019 50%,#DA5019 ${p}%,#fff ${p}%)`
+        );
       } else {
         this.startInput();
       }
     },
     stopProblem: function () {
       playAudio(SOUNDS.ANSWER);
+      const p = this.scoreDiff / 2;
+      this.progressBG = `linear-gradient(to right,#edad0b 0%,#edad0b ${p}%,#fff ${p}%)`;
       this.startInput();
     },
     startInput: function () {
