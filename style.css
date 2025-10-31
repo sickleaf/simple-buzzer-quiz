@@ -41,6 +41,8 @@
   width: 100vw;
   padding: calc(var(--keyboard-key-margin) / 2) 0;
   background: gainsboro;
+  /* Disable "double-tap to zoom" */
+  touch-action: manipulation;
 }
 
 .keyboard-row {
