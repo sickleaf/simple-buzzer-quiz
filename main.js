@@ -1,6 +1,6 @@
 const TICK_INTERVAL = 125;  /* msec */
 const INPUT_TIMER   = 5999; /* msec */
-const BS_PENALTY    = 500; /* msec */
+const BS_PENALTY    = 200; /* msec */
 const IS_TOUCH = "ontouchstart" in window;
 
 function shuffleArray (array) {
@@ -53,7 +53,8 @@ const data = {
   alphaCorrect: null,
   kanaCorrect: null,
   inputTimer: null,
-  inputTimerHistory: [],
+  bsCount: null,
+  inputTimerHistory: null,
 };
 
 const vm = new Vue({
@@ -149,9 +150,10 @@ const vm = new Vue({
     startInput: function () {
       playAudio(SOUNDS.TIMER);
       this.inputTimer = INPUT_TIMER;
-      this.inputTimerHistory = [];
       this.kanaInput = this.alphaInput = this.pendingKana = "";
       this.alphaCorrect = this.kanaCorrect = false;
+      this.inputTimerHistory = [];
+      this.bsCount = 0;
       this.state = STATES.INPUT;
     },
     processInput: function (key) {
@@ -159,6 +161,7 @@ const vm = new Vue({
       playAudio(SOUNDS.KEY);
       this.inputTimerHistory = this.inputTimerHistory.concat(this.inputTimer);
       this.inputTimer = INPUT_TIMER;
+      this.bsCount = Math.max(0, this.bsCount - 1);
       [this.kanaInput, this.pendingKana] = inputRomaji(this.kanaInput, this.pendingKana, key);
       this.alphaInput = this.alphaInput.concat(key);
       this.kanaCorrect = this.problems.problems[this.problemId].answers.some(
@@ -177,12 +180,14 @@ const vm = new Vue({
       }
       playAudio(SOUNDS.KEY);
       stopAudio(SOUNDS.TIMER);
+      this.bsCount += 1;
       this.alphaInput = this.alphaInput.slice(0, -1);
       [this.kanaInput, this.pendingKana] = batchInputRomaji(this.alphaInput);
       const timeSpent = INPUT_TIMER - this.inputTimer;
+      const penalty = this.bsCount * BS_PENALTY;
       this.inputTimer = Math.max(
         0,
-        this.inputTimerHistory[this.inputTimerHistory.length - 1] - timeSpent - BS_PENALTY
+        this.inputTimerHistory[this.inputTimerHistory.length - 1] - timeSpent - penalty
       );
       this.inputTimerHistory = this.inputTimerHistory.slice(0, -1);
     },
