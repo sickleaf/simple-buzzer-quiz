@@ -1,5 +1,6 @@
 const TICK_INTERVAL = 125;  /* msec */
 const INPUT_TIMER   = 5999; /* msec */
+const BS_PENALTY    = 500; /* msec */
 const IS_TOUCH = "ontouchstart" in window;
 
 function shuffleArray (array) {
@@ -179,8 +180,9 @@ const vm = new Vue({
       this.alphaInput = this.alphaInput.slice(0, -1);
       [this.kanaInput, this.pendingKana] = batchInputRomaji(this.alphaInput);
       const timeSpent = INPUT_TIMER - this.inputTimer;
-      this.inputTimer = (
-        Math.max(0, this.inputTimerHistory[this.inputTimerHistory.length - 1] - timeSpent)
+      this.inputTimer = Math.max(
+        0,
+        this.inputTimerHistory[this.inputTimerHistory.length - 1] - timeSpent - BS_PENALTY
       );
       this.inputTimerHistory = this.inputTimerHistory.slice(0, -1);
     },
