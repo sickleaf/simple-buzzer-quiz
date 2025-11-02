@@ -215,7 +215,10 @@ hr {
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: calc(var(--keyboard-key-margin) / 2) 0;
+  padding:
+    calc(var(--keyboard-key-margin) / 2)
+    0
+    calc(var(--keyboard-key-margin) / 2 + env(safe-area-inset-bottom, 0));
   background: gainsboro;
 }
 
