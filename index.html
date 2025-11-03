@@ -231,6 +231,10 @@
           <div>
             <h3>検定終了</h3>
             <p>おつかれさまでした！</p>
+            <div v-if="problems && problems.afterdescription">
+            {{ problems.afterdescription }}
+            </div>
+
           </div>
           <div>
             スコア: {{ score }} 点
