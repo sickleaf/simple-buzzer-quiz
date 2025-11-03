@@ -24,7 +24,7 @@
               早押し検定
               <small v-if="problems">〜 {{ problems.title }}</small>
             </h2>
-            <div v-if="loadError">問題の読み込みに失敗しました</div>
+            <div v-if="loadError">❌ 問題の読み込みに失敗しました</div>
             <div v-else-if="loadingStatus">{{ loadingStatus }}</div>
             <div v-else>
               作問:
@@ -81,7 +81,7 @@
             </ul>
           </div>
         </div>
-        <div v-if="loadError" class="area">問題の読み込みに失敗しました</div>
+        <div v-if="loadError" class="area">❌ 問題の読み込みに失敗しました</div>
         <div v-else-if="loadingStatus" class="area">{{ loadingStatus }}</div>
         <button v-else-if="IS_TOUCH" @click="keyDown(' ')">スタート (音が鳴ります)</button>
         <div v-else class="area">[Space] でスタート (音が鳴ります)</div>
